@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hchbht.mapper.UserMenuMapper">
+	<resultMap type="UserMenu" id="UserMenuMap">
+		<id column="id" property="id" />
+		<result column="userid" property="userid" />
+		<result column="menuid" property="menuid" />
+		<result column="status" property="status" />
+	</resultMap>
+	
+	<select id="queryUserMenuByUserId" parameterType="string" resultMap="UserMenuMap">
+		select * from tj_hchbdb_user_menu u where u.status = 1 and u.userid = #{userid}
+	</select>
+	
+	<!-- 添加 -->
+	<insert id="insertUserMenu" parameterType="UserMenu">
+		insert into tj_hchbdb_user_menu(
+			status
+			<if test="id != null and id != ''">,id</if>
+			<if test="userid != null and userid != ''">, userid</if>
+			<if test="menuid != null and menuid != ''">, menuid</if>
+		)values(
+			1
+			<if test="id != null and id != ''">,#{id}</if>
+			<if test="userid != null and userid != ''">,#{userid}</if>
+			<if test="menuid != null and menuid != ''">,#{menuid}</if>
+		)
+	</insert>
+	
+	<!-- 删除 -->
+	<delete id="deleteUserMenuByUserId" parameterType="string">
+		delete from tj_hchbdb_user_menu where userid=#{userid}
+	</delete>
+</mapper>

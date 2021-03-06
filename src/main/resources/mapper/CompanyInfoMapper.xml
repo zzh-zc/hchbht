@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hchbht.mapper.CompanyInfoMapper">
+	
+	<resultMap type="TjHchbdbCompanyInfo" id="CompanyInfoMap">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="address" property="address" />
+		<result column="contactName" property="contactName" />
+		<result column="contactPhone" property="contactPhone" />
+		<result column="boilerCapacity" property="boilerCapacity" />
+		<result column="units" property="units" />
+		<result column="type" property="type" />
+		<result column="purifierstate" property="purifierstate" />
+		<result column="isAvailable" property="isAvailable" />
+		<result column="sort" property="sort" />
+		<result column="longitude" property="longitude" />
+		<result column="latitude" property="latitude" />
+		<result column="mtype" property="mtype" />
+		<result column="ctype" property="ctype" />
+		<result column="isEquipment" property="isEquipment" />
+		<result column="eid" property="eid" />
+	</resultMap>
+	
+	<resultMap type="TjHchbdbCompanyInfo" id="CompanyInfoMap2">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="address" property="address" />
+		<result column="contactName" property="contactName" />
+		<result column="contactPhone" property="contactPhone" />
+		<result column="boilerCapacity" property="boilerCapacity" />
+		<result column="units" property="units" />
+		<result column="type" property="type" />
+		<result column="purifierstate" property="purifierstate" />
+		<result column="isAvailable" property="isAvailable" />
+		<result column="sort" property="sort" />
+		<result column="longitude" property="longitude" />
+		<result column="latitude" property="latitude" />
+		<result column="mtype" property="mtype" />
+		<result column="ctype" property="ctype" />
+		<result column="isEquipment" property="isEquipment" />
+		
+		<collection property="elist" javaType="ArrayList" column="id" ofType="Equipment" select="queryDataEquipment"/>
+	</resultMap>
+
+	<!-- 根据条件查询，单一的数据 -->
+	<select id="queryDataByCondition" parameterType="TjHchbdbCompanyInfo" resultMap="CompanyInfoMap2">
+		select * from tj_hchbdb_companyInfo
+		<where>
+			1=1
+			<if test="id != null and id != ''"> and id = #{id} </if>
+			<if test="name != null and name != ''"> and name like '%${name}%'</if>
+			<if test="address != null and address != ''"> and address like '%${address}%'</if>
+			<if test="contactName != null and contactName != ''"> and contactName like '%${contactName}%'</if>
+			<if test="contactPhone != null and contactPhone != ''"> and contactPhone = #{contactPhone}</if>
+			<if test="boilerCapacity != null and boilerCapacity != ''"> and boilerCapacity = #{boilerCapacity}</if>
+			<if test="purifierstate != null"> and purifierstate = #{purifierstate}</if>
+			<if test="units != null"> and units = #{units}</if>
+			<if test="type != null"> and type = #{type}</if>
+			<if test="isAvailable != null"> and isAvailable = #{isAvailable}</if>
+			<if test="sort != null"> and sort = #{sort}</if>
+			<if test="longitude != null and longitude != ''"> and longitude = #{longitude}</if>
+			<if test="latitude != null and latitude != ''"> and latitude = #{latitude}</if>
+			<if test="mtype != null"> and mtype = #{mtype}</if>
+			<if test="ctype != null"> and ctype = #{ctype}</if>
+			<if test="isEquipment != null"> and isEquipment = #{isEquipment}</if>
+		</where>
+	</select>
+
+	<!-- 根据条件查询，list数据 -->
+	<select id="queryDataByConditions" parameterType="TjHchbdbCompanyInfo" resultMap="CompanyInfoMap2">
+		select * from tj_hchbdb_companyInfo
+		<where>
+			1=1 and isAvailable = 1
+			<if test="id != null and id != ''"> and id = #{id} </if>
+			<if test="name != null and name != ''"> and name like '%${name}%'</if>
+			<if test="address != null and address != ''"> and address like '%${address}%'</if>
+			<if test="contactName != null and contactName != ''"> and contactName like '%${contactName}%'</if>
+			<if test="contactPhone != null and contactPhone != ''"> and contactPhone = #{contactPhone}</if>
+			<if test="boilerCapacity != null and boilerCapacity != ''"> and boilerCapacity = #{boilerCapacity}</if>
+			<if test="purifierstate != null"> and purifierstate = #{purifierstate}</if>
+			<if test="units != null"> and units = #{units}</if>
+			<if test="type != null"> and type = #{type}</if>
+			<if test="sort != null"> and sort = #{sort}</if>
+			<if test="longitude != null and longitude != ''"> and longitude = #{longitude}</if>
+			<if test="latitude != null and latitude != ''"> and latitude = #{latitude}</if>
+			<if test="mtype != null"> and mtype = #{mtype}</if>
+			<if test="ctype != null"> and ctype = #{ctype}</if>
+			<if test="isEquipment != null"> and isEquipment = #{isEquipment}</if>
+		</where>
+	</select>
+	
+	<!-- 根据企业id查询关联的设备信息 -->
+	<select id="queryDataEquipment" parameterType="String" resultType="Equipment">
+		select e.* 
+		from tj_hchbdb_equipment e 
+		left join tj_hchbdb_companyInfo_equipment ce
+			on e.id = ce.equipmentid
+		<where>
+			ce.companyid = #{companyid}
+		</where>
+	</select>
+	
+	<!-- 根据设备id查询当前数值量    n 1:voc 碳氢化合物浓度；2：工况  A；3:油烟 油烟浓度 -->
+	<select id="queryValue" resultType="java.lang.String">
+		<if test="n == 1">
+	        select cast(avg(m.hydrocarbon) as varchar) as hydrocarbon
+			from (select cast(h.hydrocarbon as numeric(10,3)) as hydrocarbon
+			      from tj_hchbdb_air_historicalhoursvoc h 
+			      where datediff(day,h.historicaltime,getdate())=0
+					and h.equipmentid = #{equipmentid}
+				  ) m
+	  	</if>
+	    <if test="n == 2">
+	    	select cast(avg(m.yfan) as varchar)+','+cast(avg(m.fancurrent) as varchar) as total
+			from (select cast(h.yfan as numeric(10,3)) as yfan, 
+						cast(h.fancurrent as numeric(10,3)) as fancurrent
+			      from tj_hchbdb_working_historicalhoursvalue h 
+			      where datediff(day,h.historicaltime,getdate())=0
+					and h.equipmentid = #{equipmentid}
+				  ) m
+	    </if>
+	    <if test="n == 3">
+	        select cast(avg(m.concentration) as varchar) as concentration
+			from (select cast(h.concentration as numeric(10,3)) as concentration
+			      from tj_hchbdb_lampblack_historicalhoursvalue h 
+			      where datediff(day,h.historicaltime,getdate())=0
+					and h.equipmentid = #{equipmentid}
+				  ) m
+	    </if>
+	</select>
+	
+	<!-- 根据条件查询，list数据，历史检测 -->
+	<select id="queryDataByConditionsH" parameterType="TjHchbdbCompanyInfo" resultMap="CompanyInfoMap">
+		select c.*,e.eid
+		from tj_hchbdb_companyInfo c
+		left join tj_hchbdb_companyInfo_equipment ce
+			on c.id = ce.companyid
+		left join tj_hchbdb_equipment e
+			on ce.equipmentid = e.id
+		<where>
+			ce.status = 0
+			<if test="stype == 1"> and e.eid like '%V'</if>
+			<if test="stype == 2"> and e.eid like '%G'</if>
+			<if test="stype == 3"> and e.eid like '%Y'</if>
+			<if test="id != null and id != ''"> and c.id = #{id} </if>
+			<if test="name != null and name != ''"> and c.name like '%${name}%'</if>
+			<if test="address != null and address != ''"> and c.address like '%${address}%'</if>
+			<if test="contactName != null and contactName != ''"> and c.contactName like '%${contactName}%'</if>
+		</where>
+	</select>
+	<!-- 根据设备id查询当前数值量    n 1:voc ；2：工况  ；3:油烟  -->
+	<select id="queryDataNumberByEquipmentid" resultType="java.lang.Integer">
+		<if test="n == 1">
+	    	select count(id)
+			from tj_hchbdb_air_historicalminutesvoc
+			where historicaltime <![CDATA[ <= ]]> getdate() 
+				and datediff(hh,historicaltime, getdate()) <![CDATA[ < ]]> 4 
+				and equipmentid = #{equipmentid}
+	  	</if>
+	    <if test="n == 2">
+	    	select count(id)
+			from tj_hchbdb_working_historicalminutesvalue
+			where historicaltime <![CDATA[ <= ]]> getdate() 
+				and datediff(hh,historicaltime, getdate()) <![CDATA[ < ]]> 4
+				and equipmentid = #{equipmentid}
+	    </if>
+	    <if test="n == 3">
+	    	select count(id)
+			from tj_hchbdb_lampblack_historicalminutesvalue
+			where historicaltime <![CDATA[ <= ]]> getdate() 
+				and datediff(hh,historicaltime, getdate()) <![CDATA[ < ]]> 4
+				and equipmentid = #{equipmentid}
+	    </if>
+	</select>
+	<!-- 根据企业设备类型，查设备当前最新数据的时间    n 1:voc ；2：工况  ；3:油烟  -->
+	<select id="queryDataTime" resultType="java.lang.String">
+		<if test="n == 1">
+	    	select top 1 convert(varchar(100), monitoringtime, 20)
+			from tj_hchbdb_air_monitoringvoc
+			where equipmentid = #{equipmentid}
+			order by monitoringtime desc
+	  	</if>
+	    <if test="n == 2">
+	    	select top 1 convert(varchar(100), monitoringtime, 20)
+			from tj_hchbdb_working_conditionvalue
+			where equipmentid = #{equipmentid} and workingtype != 9
+			order by monitoringtime desc
+	    </if>
+	    <if test="n == 3">
+	    	select top 1 convert(varchar(100), monitoringtime, 20)
+			from tj_hchbdb_lampblack_monitoringvalue
+			where equipmentid = #{equipmentid}
+			order by monitoringtime desc
+	    </if>
+	</select>
+</mapper>

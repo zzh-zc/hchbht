@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hchbht.mapper.RoleMapper">	
+	<resultMap type="Role" id="RoleMap">
+		<id column="id" property="id" />
+		<result column="rolename" property="rolename" />
+		<result column="status" property="status" />
+	</resultMap>
+
+	<!-- 添加 -->
+	<insert id="insertRole" parameterType="Role">
+		insert into tj_hchbdb_role(
+			status
+			<if test="id != null and id != ''">,id</if>
+			<if test="rolename != null and rolename != ''">,rolename</if>
+		)values(
+			1
+			<if test="id != null and id != ''">,#{id}</if>
+			<if test="rolename != null and rolename != ''">,#{rolename}</if>
+		)
+	</insert>
+	
+	<!-- 删除 -->
+	<update id="deleteRole" parameterType="string">
+		update tj_hchbdb_role set status = 0 where id=#{id}
+	</update>
+	
+	<!-- 修改 -->
+	<update id="updateRole" parameterType="Role">
+		update 
+			tj_hchbdb_role
+		<set>
+			<if test="rolename != null and rolename != ''">rolename=#{rolename}</if>
+		</set>
+		where id=#{id}
+	</update>
+
+	<!-- 根据Id查询 -->
+	<select id="queryRoleById" parameterType="string" resultMap="RoleMap">
+		select * from tj_hchbdb_role where id=#{id} and status = 1
+	</select>
+	
+	<select id="queryALLRole" resultMap="RoleMap">
+		select * from tj_hchbdb_role r where r.status = 1
+	</select>
+	
+	<select id="queryRoleByUserId" parameterType="string" resultMap="RoleMap">
+		select r.* 
+		from tj_hchbdb_role r 
+		left join tj_hchbdb_user_role ur
+			on r.id = ur.roleid
+		left join tj_hchbdb_user u
+			on ur.userid = u.id
+		where u.id=#{userid} and r.status = 1
+	</select>
+	
+</mapper>

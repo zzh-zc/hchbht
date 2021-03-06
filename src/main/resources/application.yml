@@ -1,0 +1,34 @@
+server:
+  port: 9090
+  servlet:
+    context-path: /hchbht
+spring:
+  application: #服务名
+    name: hchbht
+  profiles: # 环境设置：dev、test、prod
+    active: dev
+
+#是否开启 swagger-ui
+swagger:
+  enabled: true
+#mybatis
+mybatis-plus:
+  type-aliases-package: com.hchbht.model
+  mapper-locations: classpath:mapper/*.xml
+  #  config-location: classpath:mybatis/mybatis-config.xml
+  configuration:
+    map-underscore-to-camel-case: true # 驼峰命名
+
+#pagehelper
+pagehelper:
+  helperDialect: sqlserver
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
+logging:
+  level:
+    root: info
+    com.hchbht.mapper: debug
+  file:
+    name: log/blog-dev.log

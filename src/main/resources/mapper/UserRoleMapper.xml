@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hchbht.mapper.UserRoleMapper">
+	<resultMap type="UserRole" id="UserRoleMap">
+		<id column="id" property="id" />
+		<result column="userid" property="userid" />
+		<result column="roleid" property="roleid" />
+		<result column="status" property="status" />
+	</resultMap>
+	
+	<select id="queryUserRoleByUserId" parameterType="string" resultMap="UserRoleMap">
+		select * from tj_hchbdb_user_role ur where ur.status = 1 and ur.userid = #{userid}
+	</select>
+	
+	<!-- 添加 -->
+	<insert id="insertUserRole" parameterType="UserRole">
+		insert into tj_hchbdb_user_role(
+			status
+			<if test="id != null and id != ''">,id</if>
+			<if test="userid != null and userid != ''">,userid</if>
+			<if test="roleid != null and roleid != ''">,roleid</if>
+		)values(
+			1
+			<if test="id != null and id != ''">,#{id}</if>
+			<if test="userid != null and userid != ''">,#{userid}</if>
+			<if test="roleid != null and roleid != ''">,#{roleid}</if>
+		)
+	</insert>
+	
+	<!-- 删除 -->
+	<delete id="deleteUserRoleByUserId" parameterType="string">
+		delete from tj_hchbdb_user_role where userid=#{userid}
+	</delete>
+	
+</mapper>

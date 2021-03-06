@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hchbht.mapper.UserMapper">
+	<resultMap type="TjHchbdbUser" id="UserMap">
+		<id column="id" property="id" />
+		<result column="username" property="username" />
+		<result column="password" property="password" />
+		<result column="realname" property="realname" />
+		<result column="organizationid" property="organizationid" />
+		<result column="status" property="status" />
+	</resultMap>
+	
+	<!-- 添加 -->
+	<insert id="insertUser" parameterType="TjHchbdbUser">
+		insert into tj_hchbdb_user(
+			status
+			<if test="id != null and id != ''">,id</if>
+			<if test="username != null and username != ''">, username</if>
+			<if test="password != null and password != ''">, password</if>
+			<if test="realname != null and realname != ''">, realname</if>
+			<if test="organizationid != null and organizationid != ''">, organizationid</if>
+		)values(
+			1
+			<if test="id != null and id != ''">,#{id}</if>
+			<if test="username != null and username != ''">,#{username}</if>
+			<if test="password != null and password != ''">,#{password}</if>
+			<if test="realname != null and realname != ''">,#{realname}</if>
+			<if test="organizationid != null and organizationid != ''">,#{organizationid}</if>
+		)
+	</insert>
+	
+	<!-- 删除 -->
+	<update id="deleteUser" parameterType="string">
+		update tj_hchbdb_user set status = 0 where id=#{id}
+	</update>
+	
+	<!-- 修改 -->
+	<update id="updateUser" parameterType="TjHchbdbUser">
+		update 
+			tj_hchbdb_user
+		<set>
+			<if test="username != null and username != ''">username=#{username}</if>
+			<if test="password != null and password != ''">,password=#{password}</if>
+			<if test="realname != null and realname != ''">,realname=#{realname}</if>
+			<if test="organizationid != null and organizationid != ''">,organizationid=#{organizationid}</if>
+		</set>
+		where id=#{id}
+	</update>
+
+	<!-- 根据Id查询 -->
+	<select id="queryUserById" parameterType="string" resultMap="UserMap">
+		select * from tj_hchbdb_user where id=#{id}
+	</select>
+	
+	<!-- 根据name,pass查询 -->
+	<select id="queryUserByNP" parameterType="TjHchbdbUser" resultMap="UserMap">
+		select * from tj_hchbdb_user where username=#{username} and password=#{password}
+	</select>
+	
+	<select id="queryALLUser" resultMap="UserMap">
+		select * from tj_hchbdb_user u where u.status = 1
+	</select>
+</mapper>

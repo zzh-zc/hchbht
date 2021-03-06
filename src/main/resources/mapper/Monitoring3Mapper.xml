@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hchbht.mapper.Monitoring3Mapper">
+
+	<!-- voc -->
+	<resultMap type="com.hchbht.model.monitoring.AirMonitoringVOC" id="AirMonitoringVOCMap">
+		<id column="id" property="id" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="monitoringtime" property="monitoringtime" />
+		
+		<result column="hydrocarbon" property="hydrocarbon" />
+		<result column="rate" property="rate" />
+		<result column="temperature" property="temperature" />
+		<result column="pressure" property="pressure" />
+		<result column="humidity" property="humidity" />
+		<result column="wastegas" property="wastegas" />
+		
+		<result column="companyid" property="companyid" />
+		<result column="companyname" property="companyname" />
+	</resultMap>
+	<!-- 工况 -->
+	<resultMap type="com.hchbht.model.monitoring.WorkingConditionValue" id="WorkingConditionValueMap">
+		<id column="id" property="id" />
+		<result column="workingtype" property="workingtype" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="equipmentname" property="equipmentname" />
+		<result column="probeid" property="probeid" />
+		<result column="monitoringtime" property="monitoringtime" />
+		<!-- TVOC字段 -->
+		<result column="fancurrent" property="fancurrent" />
+		<result column="fanstate" property="fanstate" />
+		<result column="vocwpcurrent" property="vocwpcurrent" />
+		<result column="vocwpstate" property="vocwpstate" />
+		<!-- TVOC 、 锅炉公用字段 -->
+		<!-- <result column="totalcurrent" property="totalcurrent" />
+		<result column="pointscurrent" property="pointscurrent" /> -->
+		<result column="adsorption" property="adsorption" />
+		<!-- 锅炉字段 -->
+		<result column="yfan" property="yfan" />
+		<result column="yfanstate" property="yfanstate" />
+		<result column="gfan" property="gfan" />
+		<result column="gfanstate" property="gfanstate" />
+		<result column="glwpcurrent" property="glwpcurrent" />
+		<result column="glwpstate" property="glwpstate" />
+		<!-- <result column="gleledust" property="gleledust" /> -->
+		<!-- <result column="glfilmdust" property="glfilmdust" /> -->
+		<result column="glbagdust" property="glbagdust" />
+		<!-- 非数据库字段 -->
+		<result column="companyid" property="companyid" />
+		<result column="companyname" property="companyname" />
+	</resultMap>
+	<!-- 油烟 -->
+	<resultMap type="com.hchbht.model.monitoring.LampblackMonitoringValue" id="LampblackMonitoringValueMap">
+		<id column="id" property="id" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="probeid" property="probeid" />
+		<result column="monitoringtime" property="monitoringtime" />
+		<result column="concentration" property="concentration" />
+		<result column="fanstate" property="fanstate" />
+		<result column="purifierstate" property="purifierstate" />
+		<result column="purifiercurrent" property="purifiercurrent" />
+		<result column="temperature" property="temperature" />
+		
+		<result column="companyid" property="companyid" />
+		<result column="companyname" property="companyname" />
+	</resultMap>
+	
+	<!-- voc实时数据 -->
+	<select id="queryLastDataVoc" resultMap="AirMonitoringVOCMap">
+	select a.id as companyid, a.name as companyname, a.eid as equipmentid, 
+		b.monitoringtime, b.hydrocarbon, b.rate, b.temperature,
+		b.pressure, b.humidity, b.wastegas
+	from (select c.id, c.name, e.eid
+		from tj_hchbdb_companyInfo c
+		left join tj_hchbdb_companyInfo_equipment ce
+			on c.id = ce.companyid
+		left join tj_hchbdb_equipment e
+			on ce.equipmentid = e.id	
+		where e.eid like '%V'
+			<if test="companyInfo.name != null and companyInfo.name != ''"> and c.name like '%${companyInfo.name}%'</if>) a
+	left join (select t.* 
+			from (select *,row_number() 
+					over (partition by equipmentid order by monitoringtime desc) rn 
+				from tj_hchbdb_air_monitoringvoc
+				) t
+			where rn=1) b
+		on a.eid = b.equipmentid
+	order by a.name desc
+	</select>
+	
+<!--	&lt;!&ndash; 工况 &ndash;&gt;-->
+<!--	<select id="queryLastDataWork" resultMap="WorkingConditionValueMap">-->
+<!--	select a.id as companyid, a.name as companyname, a.eid as equipmentid, -->
+<!--		b.monitoringtime,b.workingtype,-->
+<!--		w2.probeid,w2.adsorption,w2.glbagdust,-->
+<!--		w3.equipmentname,w3.fancurrent,w3.fanstate,w3.vocwpcurrent,w3.vocwpstate,-->
+<!--		w3.yfan,w3.yfanstate,w3.gfan,w3.gfanstate,w3.glwpcurrent,w3.glwpstate-->
+<!--	from (select c.id, c.name, e.eid-->
+<!--		from tj_hchbdb_companyInfo c-->
+<!--		left join tj_hchbdb_companyInfo_equipment ce-->
+<!--			on c.id = ce.companyid-->
+<!--		left join tj_hchbdb_equipment e-->
+<!--			on ce.equipmentid = e.id	-->
+<!--		where e.eid like '%G'-->
+<!--			<if test="companyInfo.name != null and companyInfo.name != ''"> and c.name like '%${companyInfo.name}%'</if>) a-->
+<!--	left join (select t.* -->
+<!--			from (select row_number() over (partition by equipmentid order by monitoringtime desc) rn,-->
+<!--				id, equipmentid, monitoringtime, workingtype-->
+<!--				from tj_hchbdb_working_conditionvalue-->
+<!--				where equipmentid like '%G') t-->
+<!--			where rn=1) b-->
+<!--		on a.eid = b.equipmentid-->
+<!--	left join tj_hchbdb_working_conditionvalue w2-->
+<!--		on b.id = w2.equipmentid-->
+<!--	left join tj_hchbdb_working_conditionvalue w3-->
+<!--		on w2.id = w3.equipmentid-->
+<!--	order by a.name desc-->
+<!--	</select>-->
+<!--	-->
+<!--	&lt;!&ndash; 油烟 &ndash;&gt;-->
+<!--	<select id="queryLastDataLamp" resultMap="LampblackMonitoringValueMap">-->
+<!--	select a.id as companyid, a.name as companyname, a.eid as equipmentid, -->
+<!--		b.monitoringtime, b.probeid, b.concentration, b.fanstate, -->
+<!--		b.purifierstate, b.purifiercurrent, b.temperature-->
+<!--	from (select c.id, c.name, e.eid-->
+<!--		from tj_hchbdb_companyInfo c-->
+<!--		left join tj_hchbdb_companyInfo_equipment ce-->
+<!--			on c.id = ce.companyid-->
+<!--		left join tj_hchbdb_equipment e-->
+<!--			on ce.equipmentid = e.id	-->
+<!--		where e.eid like '%Y'-->
+<!--			<if test="companyInfo.name != null and companyInfo.name != ''"> and c.name like '%${companyInfo.name}%'</if>) a-->
+<!--	left join (select t.* -->
+<!--			from (select *,row_number() -->
+<!--					over (partition by equipmentid order by monitoringtime desc) rn -->
+<!--				from tj_hchbdb_lampblack_monitoringvalue-->
+<!--				) t-->
+<!--			where rn=1) b-->
+<!--		on a.eid = b.equipmentid-->
+<!--	order by a.name desc-->
+<!--	</select>-->
+</mapper>

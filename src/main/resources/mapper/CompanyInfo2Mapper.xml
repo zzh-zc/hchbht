@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hchbht.mapper.CompanyInfo2Mapper">
+	
+	<resultMap type="TjHchbdbCompanyInfo" id="CompanyInfoMap">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="eid" property="eid" />
+		<!-- //工况实时页面，记录voc、工况、油烟时间 -->
+		<result column="voctime" property="voctime" />
+		<result column="worktime" property="worktime" />
+		<result column="lamptime" property="lamptime" />
+	</resultMap>
+	
+	<resultMap type="TjHchbdbCompanyInfo" id="CompanyInfoMap2">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="eid" property="eid" />
+		<result column="mtype" property="mtype" />
+		<result column="ctype" property="ctype" />
+		<result column="type" property="type" />
+		<result column="longitude" property="longitude" />
+		<result column="latitude" property="latitude" />
+		<!-- //工况实时页面，记录voc、工况、油烟时间 -->
+		<result column="voctime" property="voctime" />
+		<result column="worktime" property="worktime" />
+		<result column="lamptime" property="lamptime" />
+	</resultMap>
+	
+	<!-- 实时工况，工业污染 -->
+	<select id="queryGywrGK" parameterType="TjHchbdbCompanyInfo" resultMap="CompanyInfoMap">
+	select a.id, a.name, a.eid, b.historicaltime as voctime, c.historicaltime as worktime
+	from (select c.id, c.name, e.eid   
+		from tj_hchbdb_companyInfo c   
+		left join tj_hchbdb_companyInfo_equipment ce    
+			on c.id = ce.companyid   
+		left join tj_hchbdb_equipment e    
+			on ce.equipmentid = e.id    
+		where e.eid like '%V' or e.eid like '%G'
+			<if test="name != null and name != ''"> and c.name like '%${name}%'</if>) a  
+	left join (select t.*     
+		from (select equipmentid, historicaltime ,row_number()       
+				over (partition by equipmentid order by historicaltime desc) rn      
+			from tj_hchbdb_air_historicalhoursvoc
+			) t    
+		where rn=1) b   
+	on a.eid = b.equipmentid  
+	left join (select t.*     
+		from (select equipmentid, historicaltime ,row_number()       
+				over (partition by equipmentid order by historicaltime desc) rn      
+			from tj_hchbdb_working_historicalhoursvalue
+			) t    
+		where rn=1) c
+	on a.eid = c.equipmentid
+	order by a.name desc 
+	</select>
+	
+	<!-- 实时工况，环境质量 -->
+	<select id="queryHjzlGK" parameterType="TjHchbdbCompanyInfo" resultMap="CompanyInfoMap">
+	select a.id, a.name, a.eid, b.historicaltime as lamptime
+	from (select c.id, c.name, e.eid   
+		from tj_hchbdb_companyInfo c   
+		left join tj_hchbdb_companyInfo_equipment ce    
+			on c.id = ce.companyid   
+		left join tj_hchbdb_equipment e    
+			on ce.equipmentid = e.id    
+		where e.eid like '%Y'
+			<if test="name != null and name != ''"> and c.name like '%${name}%'</if>) a  
+	left join (select t.*     
+		from (select equipmentid, historicaltime ,row_number()       
+				over (partition by equipmentid order by historicaltime desc) rn      
+			from tj_hchbdb_lampblack_historicalhoursvalue
+			) t    
+		where rn=1) b   
+	on a.eid = b.equipmentid 
+	order by a.name desc
+	</select>
+	
+	<!-- 实时工况，根据企业id和设备id -->
+	<select id="queryGKByCidAndEid" parameterType="TjHchbdbCompanyInfo" resultMap="CompanyInfoMap">
+	select a.id, a.name, a.eid, 
+		b.historicaltime as 
+			<if test="stype == 1"> voctime </if> 
+			<if test="stype == 2"> worktime </if> 
+			<if test="stype == 3"> lamptime </if>
+	from (select c.id, c.name, e.eid   
+		from tj_hchbdb_companyInfo c   
+		left join tj_hchbdb_companyInfo_equipment ce    
+			on c.id = ce.companyid   
+		left join tj_hchbdb_equipment e    
+			on ce.equipmentid = e.id    
+		where c.id=#{id} and e.eid = #{eid}) a  
+	left join (select t.*     
+		from (select equipmentid, historicaltime ,row_number()       
+				over (partition by equipmentid order by historicaltime desc) rn      
+			from
+			<if test="stype == 1"> tj_hchbdb_air_historicalhoursvoc </if> 
+			<if test="stype == 2"> tj_hchbdb_working_historicalhoursvalue </if> 
+			<if test="stype == 3"> tj_hchbdb_lampblack_historicalhoursvalue </if>
+			) t    
+		where rn=1) b   
+	on a.eid = b.equipmentid 
+	order by a.name desc
+	</select>
+	
+	<!-- GIS，工业污染 -->
+	<select id="queryGywrGIS" parameterType="TjHchbdbCompanyInfo" resultMap="CompanyInfoMap2">
+	select a.id, a.name, a.eid, a.mtype, a.ctype, a.type, a.longitude, a.latitude,
+		b.historicaltime as voctime, c.historicaltime as worktime
+	from (select c.id, c.name, c.mtype, c.ctype, 
+			c.type, c.longitude, c.latitude, e.eid     
+		from tj_hchbdb_companyInfo c   
+		left join tj_hchbdb_companyInfo_equipment ce    
+			on c.id = ce.companyid   
+		left join tj_hchbdb_equipment e    
+			on ce.equipmentid = e.id    
+		where e.eid like '%V' or e.eid like '%G'
+			<if test="name != null and name != ''"> and c.name like '%${name}%'</if>
+			<if test="mtype != null"> and c.mtype = #{mtype}</if>
+			<if test="ctype != null"> and c.ctype = #{ctype}</if>
+			<if test="type != null">  and c.type = #{type}</if>) a  
+	left join (select t.*     
+		from (select equipmentid, historicaltime ,row_number()       
+				over (partition by equipmentid order by historicaltime desc) rn      
+			from tj_hchbdb_air_historicalhoursvoc
+			) t    
+		where rn=1) b   
+	on a.eid = b.equipmentid  
+	left join (select t.*     
+		from (select equipmentid, historicaltime ,row_number()       
+				over (partition by equipmentid order by historicaltime desc) rn      
+			from tj_hchbdb_working_historicalhoursvalue
+			) t    
+		where rn=1) c
+	on a.eid = c.equipmentid
+	order by a.name desc 
+	</select>
+	
+	<!-- GIS，环境质量 -->
+	<select id="queryHjzlGIS" parameterType="TjHchbdbCompanyInfo" resultMap="CompanyInfoMap2">
+	select a.id, a.name, a.eid, a.mtype, a.ctype, a.type, a.longitude, a.latitude, 
+		b.historicaltime as lamptime
+	from (select c.id, c.name, c.mtype, c.ctype, 
+			c.type, c.longitude, c.latitude, e.eid   
+		from tj_hchbdb_companyInfo c   
+		left join tj_hchbdb_companyInfo_equipment ce    
+			on c.id = ce.companyid   
+		left join tj_hchbdb_equipment e    
+			on ce.equipmentid = e.id    
+		where e.eid like '%Y'
+			<if test="name != null and name != ''"> and c.name like '%${name}%'</if>
+			<if test="mtype != null"> and c.mtype = #{mtype}</if>
+			<if test="ctype != null"> and c.ctype = #{ctype}</if>
+			<if test="type != null">  and c.type = #{type}</if>) a  
+	left join (select t.*     
+		from (select equipmentid, historicaltime ,row_number()       
+				over (partition by equipmentid order by historicaltime desc) rn      
+			from tj_hchbdb_lampblack_historicalhoursvalue
+			) t    
+		where rn=1) b   
+	on a.eid = b.equipmentid 
+	order by a.name desc
+	</select>
+</mapper>
