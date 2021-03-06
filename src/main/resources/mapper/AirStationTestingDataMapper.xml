@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hchbht.mapper.AirStationTestingDataMapper">
+	
+	<resultMap type="AirStationTestingData" id="AirStationTestingDataMap">
+		<id column="id" property="id" />
+		<result column="sort" property="sort" />
+		<result column="biz_DataType" property="datatype" />
+		<result column="biz_StationCode" property="stationCode" />
+		<result column="biz_DataTime" property="datatime" />
+		
+		<result column="so2" property="so2" />
+		<result column="no" property="no" />
+		<result column="no2" property="no2" />
+		<result column="nox" property="nox" />
+		<result column="co" property="co" />
+		<result column="o3" property="o3" />
+		<result column="pm10" property="pm10" />
+		<result column="pm25" property="pm25" />
+		<result column="windspeed" property="windspeed" />
+		<result column="winddirection" property="winddirection" />
+		<result column="temperature" property="temperature" />
+		<result column="airpressure" property="airpressure" />
+		<result column="humidity" property="humidity" />
+		<result column="rainfall" property="rainfall" />
+		
+		<result column="stationName" property="stationName" />
+	</resultMap>
+	
+	<!-- 空气站实时数据 -->
+	<select id="queryLastDataKQZ" resultMap="AirStationTestingDataMap">
+	select b.id, b.biz_DataType as datatype, b.biz_StationCode as stationCode, 
+		b.biz_DataTime as datatime,   b.so2, b.no, b.no2, b.nox, b.co, b.o3, b.pm10, b.pm25, 
+		b.windspeed, b.winddirection, b.temperature,   b.airpressure, b.humidity, b.rainfall, 
+		a.stationName  
+	from (select c.id, c.stationName, c.stationCode  
+		from tj_hchbdb_airstation c 
+		where 
+			1=1
+			<if test="air.stationName != null and air.stationName != ''"> and c.stationName like '%${air.stationName}%'</if>) a  
+	left join (select t.*     
+				from (select *,row_number() over (partition by biz_StationCode order by biz_DataTime desc) rn      
+					from tj_hchbdb_airstation_testingdata     ) t    
+				where rn=1) b   
+	on a.stationCode = b.biz_StationCode  
+	order by a.stationName desc
+	</select>
+	
+	<select id="queryBaoBiao" resultMap="AirStationTestingDataMap">
+	<if test="bbtype == 1">
+	select w.*,c.stationName as stationName
+		from tj_hchbdb_airstation_testingdata w
+		left join tj_hchbdb_airstation c 
+			on w.biz_StationCode = c.stationCode
+		where 
+			w.biz_StationCode = #{stationCode} and c.stationName is not null
+			and convert(VARCHAR(20), w.biz_DataTime, 23) <![CDATA[ >= ]]> cast(#{sd} as DATETIME)
+			and convert(VARCHAR(20), w.biz_DataTime, 23) <![CDATA[ < ]]> cast(#{ed} as DATETIME)
+		order by w.biz_DataTime desc
+	</if>
+	<if test="bbtype == 2">
+	select m.*
+	from (
+		select w.*, c.stationName as stationName
+		from (
+			select biz_StationCode,
+				cast(substring(convert(varchar(100),biz_DataTime,23),1,19) as datetime) as  datetime,
+				cast(cast(avg(cast(so2 as numeric(10,3))) as numeric(10,3)) as varchar) so2, 
+				cast(cast(avg(cast(no as numeric(10,3))) as numeric(10,3)) as varchar) no, 
+				cast(cast(avg(cast(no2 as numeric(10,3))) as numeric(10,3)) as varchar) no2, 
+				cast(cast(avg(cast(nox as numeric(10,3))) as numeric(10,3)) as varchar) nox, 
+				cast(cast(avg(cast(co as numeric(10,3))) as numeric(10,3)) as varchar) co, 
+				cast(cast(avg(cast(o3 as numeric(10,3))) as numeric(10,3)) as varchar) o3,
+				cast(cast(avg(cast(pm10 as numeric(10,3))) as numeric(10,3)) as varchar) pm10,
+				cast(cast(avg(cast(pm25 as numeric(10,3))) as numeric(10,3)) as varchar) pm25, 
+				cast(cast(avg(cast(windspeed as numeric(10,3))) as numeric(10,3)) as varchar) windspeed, 
+				cast(cast(avg(cast(temperature as numeric(10,3))) as numeric(10,3)) as varchar) temperature, 
+				cast(cast(avg(cast(airpressure as numeric(10,3))) as numeric(10,3)) as varchar) airpressure, 
+				cast(cast(avg(cast(humidity as numeric(10,3))) as numeric(10,3)) as varchar) humidity,
+				cast(cast(avg(cast(rainfall as numeric(10,3))) as numeric(10,3)) as varchar) rainfall
+			from tj_hchbdb_airstation_testingdata
+			<where>
+				<if test="stationCode != null and stationCode != ''">  and biz_StationCode = #{stationCode} </if>
+				and convert(VARCHAR(20), biz_DataTime, 23) <![CDATA[ >= ]]> cast(#{sd} as DATETIME)
+				and convert(VARCHAR(20), biz_DataTime, 23) <![CDATA[ <= ]]> cast(#{ed} as DATETIME)
+			</where> 
+			group by cast(substring(convert(varchar(100),biz_DataTime,23),1,19) as datetime), biz_StationCode
+		) w 
+		left join tj_hchbdb_airstation c 
+			on w.biz_StationCode = c.stationCode
+		where c.stationName is not null
+	) m
+	order by m.datetime desc
+	</if>
+	<if test="bbtype == 3">
+	select m.*
+	from (
+		select w.*, c.stationName as stationName
+		from (
+			select biz_StationCode,
+				cast(substring(convert(varchar(100),biz_DataTime,23),1,19) as datetime) as  datetime,
+				cast(cast(avg(cast(so2 as numeric(10,3))) as numeric(10,3)) as varchar) so2, 
+				cast(cast(avg(cast(no as numeric(10,3))) as numeric(10,3)) as varchar) no, 
+				cast(cast(avg(cast(no2 as numeric(10,3))) as numeric(10,3)) as varchar) no2, 
+				cast(cast(avg(cast(nox as numeric(10,3))) as numeric(10,3)) as varchar) nox, 
+				cast(cast(avg(cast(co as numeric(10,3))) as numeric(10,3)) as varchar) co, 
+				cast(cast(avg(cast(o3 as numeric(10,3))) as numeric(10,3)) as varchar) o3,
+				cast(cast(avg(cast(pm10 as numeric(10,3))) as numeric(10,3)) as varchar) pm10,
+				cast(cast(avg(cast(pm25 as numeric(10,3))) as numeric(10,3)) as varchar) pm25, 
+				cast(cast(avg(cast(windspeed as numeric(10,3))) as numeric(10,3)) as varchar) windspeed, 
+				cast(cast(avg(cast(temperature as numeric(10,3))) as numeric(10,3)) as varchar) temperature, 
+				cast(cast(avg(cast(airpressure as numeric(10,3))) as numeric(10,3)) as varchar) airpressure, 
+				cast(cast(avg(cast(humidity as numeric(10,3))) as numeric(10,3)) as varchar) humidity,
+				cast(cast(avg(cast(rainfall as numeric(10,3))) as numeric(10,3)) as varchar) rainfall
+			from tj_hchbdb_airstation_testingdata
+			<where>
+				<if test="stationCode != null and stationCode != ''">  and biz_StationCode = #{stationCode} </if>
+				and convert(VARCHAR(20), biz_DataTime, 23) <![CDATA[ >= ]]> cast(#{sd} as DATETIME)
+				and convert(VARCHAR(20), biz_DataTime, 23) <![CDATA[ <= ]]> cast(#{ed} as DATETIME)
+			</where> 
+			group by year(biz_DataTime), month(biz_DataTime), biz_StationCode
+		) w 
+		left join tj_hchbdb_airstation c 
+			on w.biz_StationCode = c.stationCode
+		where c.stationName is not null
+	) m
+	order by m.datetime desc
+	</if>
+	<if test="bbtype == 4">
+	select m.*
+	from (
+		select w.*, c.stationName as stationName
+		from (
+			select biz_StationCode,
+				year(biz_DataTime) years, month(biz_DataTime) months,
+				cast(year(biz_DataTime) as varchar)+'-'+cast(month(biz_DataTime) as varchar) btime, 
+				cast(cast(avg(cast(so2 as numeric(10,3))) as numeric(10,3)) as varchar) so2, 
+				cast(cast(avg(cast(no as numeric(10,3))) as numeric(10,3)) as varchar) no, 
+				cast(cast(avg(cast(no2 as numeric(10,3))) as numeric(10,3)) as varchar) no2, 
+				cast(cast(avg(cast(nox as numeric(10,3))) as numeric(10,3)) as varchar) nox, 
+				cast(cast(avg(cast(co as numeric(10,3))) as numeric(10,3)) as varchar) co, 
+				cast(cast(avg(cast(o3 as numeric(10,3))) as numeric(10,3)) as varchar) o3,
+				cast(cast(avg(cast(pm10 as numeric(10,3))) as numeric(10,3)) as varchar) pm10,
+				cast(cast(avg(cast(pm25 as numeric(10,3))) as numeric(10,3)) as varchar) pm25, 
+				cast(cast(avg(cast(windspeed as numeric(10,3))) as numeric(10,3)) as varchar) windspeed, 
+				cast(cast(avg(cast(temperature as numeric(10,3))) as numeric(10,3)) as varchar) temperature, 
+				cast(cast(avg(cast(airpressure as numeric(10,3))) as numeric(10,3)) as varchar) airpressure, 
+				cast(cast(avg(cast(humidity as numeric(10,3))) as numeric(10,3)) as varchar) humidity,
+				cast(cast(avg(cast(rainfall as numeric(10,3))) as numeric(10,3)) as varchar) rainfall
+			from tj_hchbdb_airstation_testingdata
+			<where>
+				<if test="stationCode != null and stationCode != ''">  and biz_StationCode = #{stationCode} </if>
+				and convert(VARCHAR(20), biz_DataTime, 23) <![CDATA[ >= ]]> cast(#{sd} as DATETIME)
+				and convert(VARCHAR(20), biz_DataTime, 23) <![CDATA[ <= ]]> cast(#{ed} as DATETIME)
+			</where> 
+			group by year(biz_DataTime), month(biz_DataTime), biz_StationCode
+		) w 
+		left join tj_hchbdb_airstation c 
+			on w.biz_StationCode = c.stationCode
+		where c.stationName is not null
+	) m
+	order by m.years desc
+	</if>
+	<if test="bbtype == 5">
+	select m.*
+	from (
+		select w.*, c.stationName as stationName
+		from (
+			select biz_StationCode,
+				year(biz_DataTime) years, month(biz_DataTime) months,
+				cast(year(biz_DataTime) as varchar)+'-'+cast(month(biz_DataTime) as varchar) btime, 
+				cast(cast(avg(cast(so2 as numeric(10,3))) as numeric(10,3)) as varchar) so2, 
+				cast(cast(avg(cast(no as numeric(10,3))) as numeric(10,3)) as varchar) no, 
+				cast(cast(avg(cast(no2 as numeric(10,3))) as numeric(10,3)) as varchar) no2, 
+				cast(cast(avg(cast(nox as numeric(10,3))) as numeric(10,3)) as varchar) nox, 
+				cast(cast(avg(cast(co as numeric(10,3))) as numeric(10,3)) as varchar) co, 
+				cast(cast(avg(cast(o3 as numeric(10,3))) as numeric(10,3)) as varchar) o3,
+				cast(cast(avg(cast(pm10 as numeric(10,3))) as numeric(10,3)) as varchar) pm10,
+				cast(cast(avg(cast(pm25 as numeric(10,3))) as numeric(10,3)) as varchar) pm25, 
+				cast(cast(avg(cast(windspeed as numeric(10,3))) as numeric(10,3)) as varchar) windspeed, 
+				cast(cast(avg(cast(temperature as numeric(10,3))) as numeric(10,3)) as varchar) temperature, 
+				cast(cast(avg(cast(airpressure as numeric(10,3))) as numeric(10,3)) as varchar) airpressure, 
+				cast(cast(avg(cast(humidity as numeric(10,3))) as numeric(10,3)) as varchar) humidity,
+				cast(cast(avg(cast(rainfall as numeric(10,3))) as numeric(10,3)) as varchar) rainfall
+			from tj_hchbdb_airstation_testingdata
+			<where>
+				<if test="stationCode != null and stationCode != ''">  and biz_StationCode = #{stationCode} </if>
+				and convert(VARCHAR(20), biz_DataTime, 23) <![CDATA[ >= ]]> cast(#{sd} as DATETIME)
+				and convert(VARCHAR(20), biz_DataTime, 23) <![CDATA[ <= ]]> cast(#{ed} as DATETIME)
+			</where> 
+			group by year(biz_DataTime), month(biz_DataTime), biz_StationCode
+		) w 
+		left join tj_hchbdb_airstation c 
+			on w.biz_StationCode = c.stationCode
+		where c.stationName is not null
+	) m
+	order by m.years desc
+	</if>
+	</select>
+</mapper>

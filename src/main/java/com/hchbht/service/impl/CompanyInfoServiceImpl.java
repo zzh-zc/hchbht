@@ -20,9 +20,11 @@ import com.hchbht.model.Equipment;
 import com.hchbht.model.commons.AjaxResult;
 import com.hchbht.model.commons.Constants;
 import com.hchbht.service.CompanyInfoService;
+import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
-@Service()
+@Service
+@Transactional
 public class CompanyInfoServiceImpl implements CompanyInfoService{
 	@Resource
 	private CompanyInfoMapper companyInfoMapper;

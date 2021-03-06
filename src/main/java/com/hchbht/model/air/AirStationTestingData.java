@@ -9,6 +9,8 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import tk.mybatis.mapper.annotation.NameStyle;
+import tk.mybatis.mapper.code.Style;
 
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -20,6 +22,7 @@ import javax.persistence.Transient;
 @Data
 @ApiModel(value = "空气站检测数据")
 @Table(name = "tj_hchbdb_airstation_testingdata")
+@NameStyle(Style.normal)
 public class AirStationTestingData implements Serializable{
 	private static final long serialVersionUID = 1L;
 
@@ -80,10 +83,13 @@ public class AirStationTestingData implements Serializable{
 	
 	//非数据库字段
 	@Transient
+	@ApiModelProperty(hidden = true)
 	private String stationName;		//子站名称
 	@Transient
+	@ApiModelProperty(hidden = true)
 	private String sd;
 	@Transient
+	@ApiModelProperty(hidden = true)
 	private String ed;
 	
 }

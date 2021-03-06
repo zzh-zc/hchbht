@@ -10,6 +10,7 @@ import com.hchbht.result.CommonResult;
 import com.hchbht.utils.vo.Node;
 import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
 import com.hchbht.mapper.MenuMapper;
@@ -20,7 +21,8 @@ import com.hchbht.mapper.UserRoleMapper;
 import com.hchbht.model.TjHchbdbUser;
 import com.hchbht.service.UserService;
 
-@Service("userServiceImpl")
+@Service
+@Transactional
 public class UserServiceImpl implements UserService {
 	
 	@Resource

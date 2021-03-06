@@ -24,6 +24,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import tk.mybatis.mapper.annotation.NameStyle;
 import tk.mybatis.mapper.code.Style;
 
+import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -39,6 +40,7 @@ import javax.persistence.Transient;
 @NameStyle(Style.normal)
 public class TjHchbdbCompanyInfo implements Serializable {
 	private static final long serialVersionUID = 1L;
+	@Id
 	@ApiModelProperty(value = "主键id")
 	private String id; 				// 主键id
 	@ApiModelProperty(value = "企业名称")

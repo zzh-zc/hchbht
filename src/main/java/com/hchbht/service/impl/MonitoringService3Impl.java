@@ -17,8 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.hchbht.cache.RedisCacheUtils;
 import com.hchbht.service.MonitoringService3;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class MonitoringService3Impl implements MonitoringService3 {
 	@Autowired
 	private Monitoring3Mapper monitoring3Mapper;

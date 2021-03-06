@@ -13,6 +13,7 @@ import com.hchbht.utils.vo.Node;
 import com.hchbht.utils.vo.NodeState;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -22,7 +23,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-@Service("menuServiceImpl")
+@Service
+@Transactional
 public class MenuServiceImpl implements MenuService{
 	@Resource
 	private MenuMapper menuMapper;

@@ -31,29 +31,29 @@
 	<!-- 实时工况，工业污染 -->
 	<select id="queryGywrGK" parameterType="TjHchbdbCompanyInfo" resultMap="CompanyInfoMap">
 	select a.id, a.name, a.eid, b.historicaltime as voctime, c.historicaltime as worktime
-	from (select c.id, c.name, e.eid   
-		from tj_hchbdb_companyInfo c   
-		left join tj_hchbdb_companyInfo_equipment ce    
-			on c.id = ce.companyid   
-		left join tj_hchbdb_equipment e    
-			on ce.equipmentid = e.id    
-		where e.eid like '%V' or e.eid like '%G'
-			<if test="name != null and name != ''"> and c.name like '%${name}%'</if>) a  
-	left join (select t.*     
-		from (select equipmentid, historicaltime ,row_number()       
-				over (partition by equipmentid order by historicaltime desc) rn      
+	from (select c.id, c.name, e.eid
+		from tj_hchbdb_companyInfo c
+		left join tj_hchbdb_companyInfo_equipment ce
+			on c.id = ce.companyid
+		left join tj_hchbdb_equipment e
+			on ce.equipmentid = e.id
+		where (e.eid like '%V' or e.eid like '%G')
+			<if test="name != null and name != ''"> and c.name like '%${name}%'</if>) a
+	left join (select t.*
+		from (select equipmentid, historicaltime ,row_number()
+				over (partition by equipmentid order by historicaltime desc) rn
 			from tj_hchbdb_air_historicalhoursvoc
-			) t    
-		where rn=1) b   
-	on a.eid = b.equipmentid  
-	left join (select t.*     
-		from (select equipmentid, historicaltime ,row_number()       
-				over (partition by equipmentid order by historicaltime desc) rn      
+			) t
+		where rn=1) b
+	on a.eid = b.equipmentid
+	left join (select t.*
+		from (select equipmentid, historicaltime ,row_number()
+				over (partition by equipmentid order by historicaltime desc) rn
 			from tj_hchbdb_working_historicalhoursvalue
-			) t    
+			) t
 		where rn=1) c
 	on a.eid = c.equipmentid
-	order by a.name desc 
+	order by a.name desc
 	</select>
 	
 	<!-- 实时工况，环境质量 -->
@@ -115,7 +115,7 @@
 			on c.id = ce.companyid   
 		left join tj_hchbdb_equipment e    
 			on ce.equipmentid = e.id    
-		where e.eid like '%V' or e.eid like '%G'
+		where (e.eid like '%V' or e.eid like '%G')
 			<if test="name != null and name != ''"> and c.name like '%${name}%'</if>
 			<if test="mtype != null"> and c.mtype = #{mtype}</if>
 			<if test="ctype != null"> and c.ctype = #{ctype}</if>
