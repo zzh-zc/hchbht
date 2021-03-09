@@ -3,28 +3,13 @@ package com.hchbht.mapper;
 import java.util.List;
 
 import com.hchbht.model.WarnConditionVOC;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+import tk.mybatis.mapper.common.Mapper;
 
 
 @Repository
-public interface WarnConditionVOCMapper {
-	/**
-	 * 添加
-	 */
-	public void insert(WarnConditionVOC warnConditionVOC);
-	
-	/**
-	 * 删除
-	 */
-	public void delete(String id);
-	
-	/**
-	 * 修改
-	 */
-	public void update(WarnConditionVOC warnConditionVOC);
-	
+public interface WarnConditionVOCMapper extends Mapper<WarnConditionVOC> {
 	/**
 	 * 根据条件查询单个数据
 	 */
@@ -36,15 +21,9 @@ public interface WarnConditionVOCMapper {
 	public List<WarnConditionVOC> queryDataByConditions(WarnConditionVOC warnConditionVOC);
 	
 	/**
-	 * 统计数据多少
-	 */
-	public int datasize(WarnConditionVOC warnConditionVOC);
-	
-	/**
 	 * 根据条件查询  Page 数据
 	 */
-	public List<WarnConditionVOC> queryDataByConditionsPage(@Param(value = "startrow")int startrow,
-			@Param(value = "endrow")int endrow, @Param(value = "w")WarnConditionVOC warnConditionVOC);
+	public List<WarnConditionVOC> queryDataByConditionsPage(@Param(value = "w")WarnConditionVOC warnConditionVOC);
 	
 	/**
 	 * 根据设备id查询相应的信息

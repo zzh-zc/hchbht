@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hchbht.mapper.WarnConditionWorkMapper">
+
+	<resultMap type="WarnConditionWork" id="WarnConditionWorkMap">
+		<id column="id" property="id" />
+		<result column="sort" property="sort" />
+		
+		<result column="equipmentid" property="equipmentid" />
+		
+		<result column="worktype" property="worktype" />
+		
+		<!-- TVOC字段 -->
+		<result column="fancurrent" property="fancurrent" />
+		<result column="vocwpcurrent" property="vocwpcurrent" />
+		<!-- TVOC 、 锅炉公用字段 -->
+		<result column="totalcurrent" property="totalcurrent" />
+		<result column="pointscurrent" property="pointscurrent" />
+		<result column="adsorption" property="adsorption" />
+		<!-- 锅炉字段 -->
+		<result column="yfan" property="yfan" />
+		<result column="gfan" property="gfan" />
+		<result column="glwpcurrent" property="glwpcurrent" />
+		<result column="gleledust" property="gleledust" />
+		<result column="glfilmdust" property="glfilmdust" />
+		<result column="glbagdust" property="glbagdust" />
+				
+		<result column="status" property="status" />		
+	</resultMap>
+	
+	<!-- 根据条件查询，单一的数据 -->
+	<select id="queryDataByCondition" parameterType="WarnConditionWork" resultMap="WarnConditionWorkMap">
+		select w.*, c.id as companyid, c.name as companyname
+		from tj_hchbdb_warnconditionwork w
+		left join tj_hchbdb_equipment e
+			on e.eid = w.equipmentid
+		left join tj_hchbdb_companyInfo_equipment aue 
+				on e.id = aue.equipmentid 
+		left join tj_hchbdb_companyInfo c 
+			on aue.companyid = c.id
+		<where>
+			1=1
+			<if test="id != null and id != ''"> and w.id=#{id}</if>
+			<if test="equipmentid != null and equipmentid != ''"> and w.equipmentid=#{equipmentid}</if>
+			<if test="worktype != null"> and w.worktype=#{worktype}</if>
+			<if test="fancurrent != null and fancurrent != ''"> and w.fancurrent=#{fancurrent}</if>
+			<if test="vocwpcurrent != null and vocwpcurrent != ''"> and w.vocwpcurrent=#{vocwpcurrent}</if>
+			<if test="totalcurrent != null and totalcurrent != ''"> and w.totalcurrent=#{totalcurrent}</if>
+			<if test="pointscurrent != null and pointscurrent != ''"> and w.pointscurrent=#{pointscurrent}</if>
+			<if test="adsorption != null and adsorption != ''"> and w.adsorption=#{adsorption}</if>
+			<if test="yfan != null and yfan != ''"> and w.yfan=#{yfan}</if>
+			<if test="gfan != null and gfan != ''"> and w.gfan=#{gfan}</if>
+			<if test="glwpcurrent != null and glwpcurrent != ''"> and w.glwpcurrent=#{glwpcurrent}</if>
+			<if test="gleledust != null and gleledust != ''"> and w.gleledust=#{gleledust}</if>
+			<if test="glfilmdust != null and glfilmdust != ''"> and w.glfilmdust=#{glfilmdust}</if>
+			<if test="glbagdust != null and glbagdust != ''"> and w.glbagdust=#{glbagdust}</if>
+			<if test="status != null"> and w.status=#{status}</if>
+		</where>
+	</select>
+	
+	<!-- 根据条件查询，list数据 -->
+	<select id="queryDataByConditions" parameterType="WarnConditionWork" resultMap="WarnConditionWorkMap">
+		select w.*, c.id as companyid, c.name as companyname
+		from tj_hchbdb_warnconditionwork w
+		left join tj_hchbdb_equipment e
+			on e.eid = w.equipmentid
+		left join tj_hchbdb_companyInfo_equipment aue 
+				on e.id = aue.equipmentid 
+		left join tj_hchbdb_companyInfo c 
+			on aue.companyid = c.id
+		<where>
+			1=1
+			<if test="id != null and id != ''"> and w.id=#{id}</if>
+			<if test="equipmentid != null and equipmentid != ''"> and w.equipmentid=#{equipmentid}</if>
+			<if test="worktype != null"> and w.worktype=#{worktype}</if>
+			<if test="fancurrent != null and fancurrent != ''"> and w.fancurrent=#{fancurrent}</if>
+			<if test="vocwpcurrent != null and vocwpcurrent != ''"> and w.vocwpcurrent=#{vocwpcurrent}</if>
+			<if test="totalcurrent != null and totalcurrent != ''"> and w.totalcurrent=#{totalcurrent}</if>
+			<if test="pointscurrent != null and pointscurrent != ''"> and w.pointscurrent=#{pointscurrent}</if>
+			<if test="adsorption != null and adsorption != ''"> and w.adsorption=#{adsorption}</if>
+			<if test="yfan != null and yfan != ''"> and w.yfan=#{yfan}</if>
+			<if test="gfan != null and gfan != ''"> and w.gfan=#{gfan}</if>
+			<if test="glwpcurrent != null and glwpcurrent != ''"> and w.glwpcurrent=#{glwpcurrent}</if>
+			<if test="gleledust != null and gleledust != ''"> and w.gleledust=#{gleledust}</if>
+			<if test="glfilmdust != null and glfilmdust != ''"> and w.glfilmdust=#{glfilmdust}</if>
+			<if test="glbagdust != null and glbagdust != ''"> and w.glbagdust=#{glbagdust}</if>
+			<if test="status != null"> and w.status=#{status}</if>
+		</where>
+	</select>
+	
+
+	<!-- 根据条件查询  Page 数据 -->
+	<select id="queryDataByConditionsPage" resultMap="WarnConditionWorkMap">
+	select w1.*
+	from (
+		select w.*, c.id as companyid, c.name as companyname
+		from tj_hchbdb_warnconditionwork w
+		left join tj_hchbdb_equipment e
+			on e.eid = w.equipmentid
+		left join tj_hchbdb_companyInfo_equipment aue 
+				on e.id = aue.equipmentid 
+		left join tj_hchbdb_companyInfo c 
+			on aue.companyid = c.id
+		<if test="w.companyname != null and w.companyname != ''">
+		where c.name like '%${w.companyname}%'
+		</if>
+	) w1, (
+		select  m.id
+		from ( 
+			select *
+			from tj_hchbdb_warnconditionwork 
+			where
+				1=1
+				<if test="w.id != null and w.id != ''"> and id=#{w.id}</if>
+				<if test="w.equipmentid != null and w.equipmentid != ''"> and equipmentid=#{w.equipmentid}</if>
+				<if test="w.worktype != null"> and worktype=#{w.worktype}</if>
+				<if test="w.fancurrent != null and w.fancurrent != ''"> and fancurrent=#{w.fancurrent}</if>
+				<if test="w.vocwpcurrent != null and w.vocwpcurrent != ''"> and vocwpcurrent=#{w.vocwpcurrent}</if>
+				<if test="w.totalcurrent != null and w.totalcurrent != ''"> and totalcurrent=#{w.totalcurrent}</if>
+				<if test="w.pointscurrent != null and w.pointscurrent != ''"> and pointscurrent=#{w.pointscurrent}</if>
+				<if test="w.adsorption != null and w.adsorption != ''"> and adsorption=#{w.adsorption}</if>
+				<if test="w.yfan != null and w.yfan != ''"> and yfan=#{w.yfan}</if>
+				<if test="w.gfan != null and w.gfan != ''"> and gfan=#{w.gfan}</if>
+				<if test="w.glwpcurrent != null and w.glwpcurrent != ''"> and glwpcurrent=#{w.glwpcurrent}</if>
+				<if test="w.gleledust != null and w.gleledust != ''"> and gleledust=#{w.gleledust}</if>
+				<if test="w.glfilmdust != null and w.glfilmdust != ''"> and glfilmdust=#{w.glfilmdust}</if>
+				<if test="w.glbagdust != null and w.glbagdust != ''"> and glbagdust=#{w.glbagdust}</if>
+				<if test="w.status != null"> and status=#{w.status}</if>
+			)m 
+		) w2 
+	where w1.id = w2.id
+	</select>
+	
+	<!-- 根据设备id查询相应的信息 -->
+	<select id="queryDataByEid" parameterType="java.lang.String" resultMap="WarnConditionWorkMap">
+		select * from tj_hchbdb_warnconditionwork where equipmentid=#{w.equipmentid} and status = 1
+	</select>
+</mapper>

@@ -21,7 +21,7 @@ public class River implements Serializable{
 	private String id;
 	@ApiModelProperty(value = "流域名称")
 	private String rivername;		//流域名称
-	@ApiModelProperty(value = "状态，0：无效，1：有效")
+	@ApiModelProperty(value = "状态，0：无效，1：有效",example = "1")
 	private Integer status;			//状态，0：无效，1：有效
 
 }

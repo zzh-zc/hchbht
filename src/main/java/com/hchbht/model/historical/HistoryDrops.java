@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
+import javax.persistence.Id;
 import javax.persistence.Transient;
 
 /**
@@ -21,6 +22,7 @@ import javax.persistence.Transient;
 @ApiModel(value = "历史掉线")
 public class HistoryDrops implements Serializable{
 	private static final long serialVersionUID = 1L;
+	@Id
 	@ApiModelProperty(value = "主键id")
 	private String id;			//主键id
 	@ApiModelProperty(value = "排序")
@@ -40,6 +42,7 @@ public class HistoryDrops implements Serializable{
 	
 	//非数据库字段
 	@Transient
+	@ApiModelProperty(hidden = true,example = "1")
 	private Integer chooseId;//当期那模块，1：工业污染，2：环境质量
 
 

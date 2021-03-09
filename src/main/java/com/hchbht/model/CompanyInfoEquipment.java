@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.persistence.Id;
 import java.io.Serializable;
 
 /**
@@ -15,16 +16,16 @@ import java.io.Serializable;
 @ApiModel(value = "企业设备关联表")
 public class CompanyInfoEquipment implements Serializable{
 	private static final long serialVersionUID = 1L;
-
+	@Id
 	@ApiModelProperty(value = "主键id")
 	private String id;			//主键id
-	@ApiModelProperty(value = "排序")
+	@ApiModelProperty(value = "排序",example = "1")
 	private Integer sort;		//排序，自动增长
 	@ApiModelProperty(value = "企业id")
 	private String companyid;	//企业id
 	@ApiModelProperty(value = "设备id")
 	private String equipmentid;	//设备id
-	@ApiModelProperty(value = "状态")
+	@ApiModelProperty(value = "状态",example = "1")
 	private Integer status;		//状态，是否有效，0：有效，1：无效
 	
 }

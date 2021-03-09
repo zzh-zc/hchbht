@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hchbht.mapper.WarnInfoMapper">
+
+	<resultMap type="WarnInfo" id="WarnInfoMap">
+		<id column="id" property="id" />
+		<result column="sort" property="sort" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="happentime" property="happentime" />
+		<result column="describe" property="describe" />
+		<result column="isdispose" property="isdispose" />
+		<result column="disposetime" property="disposetime" />	
+		<result column="status" property="status" />		
+		<result column="companyname" property="companyname" />
+	</resultMap>
+	
+	<!-- 根据条件查询，单一的数据 -->
+	<select id="queryDataByCondition" parameterType="WarnInfo" resultMap="WarnInfoMap">
+		select w.*, u.name from tj_hchbdb_warnInfo w
+		left join tj_hchbdb_equipment e
+			on w.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment aue 
+			on e.id = aue.equipmentid 
+		left join tj_hchbdb_companyInfo u 
+			on aue.companyid = u.id 
+		<where>
+			1=1
+			<if test="chooseId == 1"> and w.equipmentid like '%V' or w.equipmentid like '%G'</if>
+			<if test="chooseId == 2"> and w.equipmentid like '%Y'</if>
+			<if test="id != null and id != ''"> and w.id=#{id}</if>
+			<if test="equipmentid != null and equipmentid != ''"> and w.equipmentid=#{equipmentid}</if>
+			<if test="happentime != null and happentime != ''"> and w.happentime=#{happentime}</if>
+			<if test="describe != null and describe != ''"> and w.describe like '%${describe}%'</if>
+			<if test="isdispose != null"> and w.isdispose=#{isdispose}</if>
+			<if test="disposetime != null and disposetime != ''"> and w.disposetime=#{disposetime}</if>
+			<if test="status != null"> and w.status=#{status}</if>
+			<if test="companyname != null and companyname != ''"> and u.name like '%${companyname}%"</if>
+		</where>
+	</select>
+	
+	<!-- 根据条件查询，list数据 -->
+	<select id="queryDataByConditions" parameterType="WarnInfo" resultMap="WarnInfoMap">
+		select w.*, u.name from tj_hchbdb_warnInfo w
+		left join tj_hchbdb_equipment e
+			on w.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment aue 
+			on e.id = aue.equipmentid 
+		left join tj_hchbdb_companyInfo u 
+			on aue.companyid = u.id 
+		<where>
+			1=1
+			<if test="chooseId == 1"> and w.equipmentid like '%V' or w.equipmentid like '%G'</if>
+			<if test="chooseId == 2"> and w.equipmentid like '%Y'</if>
+			<if test="id != null and id != ''"> and w.id=#{id}</if>
+			<if test="equipmentid != null and equipmentid != ''"> and w.equipmentid=#{equipmentid}</if>
+			<if test="happentime != null and happentime != ''"> and w.happentime=#{happentime}</if>
+			<if test="describe != null and describe != ''"> and w.describe like '%${describe}%'</if>
+			<if test="isdispose != null"> and w.isdispose=#{isdispose}</if>
+			<if test="disposetime != null and disposetime != ''"> and w.disposetime=#{disposetime}</if>
+			<if test="status != null"> and w.status=#{status}</if>
+			<if test="companyname != null and companyname != ''"> and u.name like '%${companyname}%"</if>
+		</where>
+		order by w.sort desc
+	</select>
+	
+	<!-- 根据条件查询  Page 数据 -->
+	<select id="queryDataByConditionsPage" resultMap="WarnInfoMap">
+	select w1.*
+	from (
+		select w.*, c.name as companyname
+		from tj_hchbdb_warnInfo w
+		left join tj_hchbdb_equipment e
+			on e.eid = w.equipmentid
+		left join tj_hchbdb_companyInfo_equipment aue 
+				on e.id = aue.equipmentid 
+		left join tj_hchbdb_companyInfo c 
+			on aue.companyid = c.id
+		<if test="w.companyname != null and w.companyname != ''">
+		where c.name like '%${w.companyname}%'
+		</if>
+	) w1, (
+		select  m.id
+		from ( 
+			select *
+			from tj_hchbdb_warnInfo 
+			where
+				1=1
+				<if test="w.chooseId == 1"> and equipmentid like '%V' or equipmentid like '%G'</if>
+				<if test="w.chooseId == 2"> and equipmentid like '%Y'</if>
+				<if test="w.id != null and w.id != ''"> and id=#{w.id}</if>
+				<if test="w.equipmentid != null and w.equipmentid != ''"> and equipmentid=#{w.equipmentid}</if>
+				<if test="w.describe != null and w.describe != ''"> and describe like '%${w.describe}%'</if>
+				<if test="w.isdispose != null"> and isdispose=#{w.isdispose}</if>
+				<if test="w.status != null"> and status=#{w.status}</if>
+				<if test="w.searchTime != null and w.searchTime != ''">
+					and convert(VARCHAR(20), happentime, 23) <![CDATA[ >= ]]> cast(#{w.sd} as DATETIME)
+					and convert(VARCHAR(20), happentime, 23) <![CDATA[ <= ]]> cast(#{w.ed} as DATETIME)
+				</if>
+		)m 
+	) w2 
+	where w1.id = w2.id
+	</select>
+	
+	<!-- 统计预警未处理的条数 -->
+	<select id="queryDataSize" resultType="java.lang.Integer">
+		select count(id) from tj_hchbdb_warnInfo where isdispose is null and status is null
+	</select>
+</mapper>

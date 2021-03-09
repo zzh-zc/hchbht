@@ -27,8 +27,8 @@ public class AirPollutionFactor implements Serializable{
 	private String apfcname;	//空气污染因子中文名字
 	@ApiModelProperty(value = "空气污染因子单位")
 	private String apfunit;		//空气污染因子单位
-	@ApiModelProperty(value = "排序")
+	@ApiModelProperty(value = "排序",example = "1")
 	private Integer sort;		//排序
-	@ApiModelProperty(value = "是否有效")
+	@ApiModelProperty(value = "是否有效",example = "1")
 	private Integer status;		//是否有效，0：无效，1：有效
 }

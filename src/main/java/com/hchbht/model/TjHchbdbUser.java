@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.persistence.Column;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.io.Serializable;
@@ -20,6 +21,7 @@ import java.util.List;
 @ApiModel(value="用户表")
 public class TjHchbdbUser implements Serializable{
 	private static final long serialVersionUID = 1L;
+	@Id
 	@Column(name = "id")
 	@ApiModelProperty(value = "主键")
 	private String id;
@@ -39,10 +41,7 @@ public class TjHchbdbUser implements Serializable{
 	@ApiModelProperty(value = "组织机构代码")
 	private String organizationid;	//组织机构代码
 	@Column(name = "status")
-	@ApiModelProperty(value = "状态")
+	@ApiModelProperty(value = "状态",example = "1")
 	private Integer status;			//状态，是否有效，0：无效，1：有效
-
-	@Transient
-	private String sex;
 
 }

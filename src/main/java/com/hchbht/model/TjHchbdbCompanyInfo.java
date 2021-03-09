@@ -51,27 +51,27 @@ public class TjHchbdbCompanyInfo implements Serializable {
 	private String contactName; 	// 联系人名称
 	@ApiModelProperty(value = "联系人电话")
 	private String contactPhone; 	// 联系人电话
-	@ApiModelProperty(value = "大模块类型")
+	@ApiModelProperty(value = "大模块类型",example = "1")
 	private Integer mtype; 			// 大模块类型 ，1、工业污染；2、环境质量
-	@ApiModelProperty(value = "次级类型")
+	@ApiModelProperty(value = "次级类型",example = "1")
 	private Integer ctype; 			// 次级类型，如果是 工业污染，1：工业废气；2：工业废水，如果是环境质量，1、环境质量，气；2、环境质量，水
-	@ApiModelProperty(value = "企业类型")
+	@ApiModelProperty(value = "企业类型",example = "1")
 	private Integer type; 			// 如果是工业污染 便选择填写，否在便不填写 ，企业类型，0：VOC企业；1：锅炉企业；2 voc+锅炉
 	@ApiModelProperty(value = "如果是工业污染，锅炉企业，则填写 锅炉容量")
 	private String boilerCapacity; 	// 如果是工业污染，锅炉企业，则填写 锅炉容量
 	@ApiModelProperty(value = "如果是工业污染，锅炉企业，则填写 容量单位")
 	private String units; 			// 如果是工业污染，锅炉企业，则填写 容量单位
-	@ApiModelProperty(value = "如果是环境质量，油烟企业，则填写净化器类型。1：静电，2：运水烟罩；3：静电+运水烟罩")
+	@ApiModelProperty(value = "如果是环境质量，油烟企业，则填写净化器类型。1：静电，2：运水烟罩；3：静电+运水烟罩",example = "1")
 	private Integer purifierstate; 	// 如果是环境质量，油烟企业，则填写净化器类型。1：静电，2：运水烟罩；3：静电+运水烟罩
-	@ApiModelProperty(value = "是否有效")
+	@ApiModelProperty(value = "是否有效",example = "1")
 	private Integer isAvailable; 	// 是否有效 0：无效;1：有效
-	@ApiModelProperty(value = "排序")
+	@ApiModelProperty(value = "排序",example = "1")
 	private Integer sort; 			// 排序
 	@ApiModelProperty(value = "经营场所经度")
 	private String longitude; 		// 经营场所经度
 	@ApiModelProperty(value = "经营场所纬度")
 	private String latitude; 		// 经营场所纬度
-	@ApiModelProperty(value = "关联设备之后，有些设备还没有传输来数据，分页查询实时数据时会收到影响，故暂时添加此属性判断，0：没有，1：有")
+	@ApiModelProperty(value = "关联设备之后，有些设备还没有传输来数据，分页查询实时数据时会收到影响，故暂时添加此属性判断，0：没有，1：有",example = "1")
 	private Integer isEquipment; 	// 关联设备之后，有些设备还没有传输来数据，分页查询实时数据时会收到影响，故暂时添加此属性判断，0：没有，1：有
 
 	// 非数据库字段
@@ -99,19 +99,19 @@ public class TjHchbdbCompanyInfo implements Serializable {
 	@ApiModelProperty(value = "关联的设备id",hidden = true)
 	private String em;//时分秒
 	@Transient
-	@ApiModelProperty(value = "关联的设备id",hidden = true)
+	@ApiModelProperty(value = "关联的设备id",hidden = true,example = "1")
 	private Integer startrow;
 	@Transient
-	@ApiModelProperty(value = "关联的设备id",hidden = true)
+	@ApiModelProperty(value = "关联的设备id",hidden = true,example = "1")
 	private Integer endrow;
 	
 	//历史监控中使用
 	@Transient
-	@ApiModelProperty(value = "关联的设备id",hidden = true)
+	@ApiModelProperty(value = "关联的设备id",hidden = true,example = "1")
 	private Integer stype; //1：voc, 2:工况, 3:油烟
 	//是否离线
 	@Transient
-	@ApiModelProperty(value = "关联的设备id",hidden = true)
+	@ApiModelProperty(value = "关联的设备id",hidden = true,example = "1")
 	private Integer isover;	//0：否，1：是
 	//工况实时页面，设备最新的实时数据时间
 	@Transient

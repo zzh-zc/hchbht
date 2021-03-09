@@ -10,6 +10,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
+import javax.persistence.Id;
+
 /**
  * 企业信息表   tj_hchbdb_unitInfo
  */
@@ -17,8 +19,9 @@ import com.alibaba.fastjson.annotation.JSONField;
 @ApiModel(value = "企业信息表")
 public class UnitInfo implements Serializable{
 	private static final long serialVersionUID = 1L;
+	@Id
 	@ApiModelProperty(value = "主键ID")
-	private int id;
+	private String id;
 	@ApiModelProperty(value = "单位信息ID")
 	private String unitID;							//单位信息ID
 	@ApiModelProperty(value = "单位类型")
@@ -101,7 +104,7 @@ public class UnitInfo implements Serializable{
 	private String unitState;						//企业状态（0未审核、1正在审核、2已审核）
 	@ApiModelProperty(value = "是否有效（1：有效，0：无效）")
 	private String isAvailable;						//是否有效（1：有效，0：无效）
-	@ApiModelProperty(value = "排序")
+	@ApiModelProperty(value = "排序",example = "1")
 	private Integer sort;							//排序
 	
 

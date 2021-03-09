@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
+import javax.persistence.Id;
 import javax.persistence.Transient;
 
 /**
@@ -22,8 +23,9 @@ import javax.persistence.Transient;
 public class LampblackMonitoringValue implements Serializable{
 	private static final long serialVersionUID = 1L;
 	@ApiModelProperty(value = "主键id")
+	@Id
 	private String id;			//主键id
-	@ApiModelProperty(value = "排序")
+	@ApiModelProperty(value = "排序",example = "1")
 	private Integer sort;		//排序，自动增长
 	@ApiModelProperty(value = "设备id，也就是排口id")
 	private String equipmentid;	//设备id，也就是排口id
@@ -35,9 +37,9 @@ public class LampblackMonitoringValue implements Serializable{
 	private Date monitoringtime;//实时时间
 	@ApiModelProperty(value = "油烟浓度")
 	private String concentration;	//油烟浓度
-	@ApiModelProperty(value = "风机状态。1，表示风机停运；0 表示风机运行正常。")
+	@ApiModelProperty(value = "风机状态。1，表示风机停运；0 表示风机运行正常。",example = "1")
 	private Integer fanstate;		//风机状态。1，表示风机停运；0 表示风机运行正常。
-	@ApiModelProperty(value = "净化器状态。1，表示净化器停运；0 表示净化器运行正常")
+	@ApiModelProperty(value = "净化器状态。1，表示净化器停运；0 表示净化器运行正常",example = "1")
 	private Integer purifierstate;	//净化器状态。1，表示净化器停运；0 表示净化器运行正常
 	@ApiModelProperty(value = "净化器工作电流")
 	private String purifiercurrent;	//净化器工作电流
@@ -46,26 +48,36 @@ public class LampblackMonitoringValue implements Serializable{
 	
 	//非数据库字段
 	@Transient
+	@ApiModelProperty(hidden = true)
 	private String companyid;	//企业id
 	@Transient
+	@ApiModelProperty(hidden = true)
 	private String companyname;	//企业名称
 	@Transient
+	@ApiModelProperty(hidden = true)
 	private String longitude;	//经度
 	@Transient
+	@ApiModelProperty(hidden = true)
 	private String latitude;	//纬度
 	@Transient
+	@ApiModelProperty(hidden = true)
 	private String concentrationunit = "mg/m";	//油烟浓度
 	@Transient
+	@ApiModelProperty(hidden = true)
 	private String purifiercurrentunit = "A";	//净化器工作电流 单位
 	@Transient
+	@ApiModelProperty(hidden = true)
 	private String temperatureunit = "°C";		//烟气温度单位
 	
 	//是否正常，0 ：不正常，1：正常
 	@Transient
+	@ApiModelProperty(hidden = true,example = "1")
 	private Integer isconcentration;	//油烟浓度
 	@Transient
+	@ApiModelProperty(hidden = true,example = "1")
 	private Integer ispurifiercurrent;	//净化器工作电流
 	@Transient
+	@ApiModelProperty(hidden = true,example = "1")
 	private Integer istemperature;		//烟气温度，单位°C
 	
 }

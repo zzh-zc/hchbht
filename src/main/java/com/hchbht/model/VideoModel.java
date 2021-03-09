@@ -10,6 +10,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
+import javax.persistence.Id;
+
 /**
  * 视频模型(tj_hchbdb_video)
  * @author Administrator
@@ -19,6 +21,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 @ApiModel(value = "视频模型")
 public class VideoModel implements Serializable{
 	private static final long serialVersionUID = 1L;
+	@Id
 	@ApiModelProperty(value = "视频ID号")
 	private String id;	//ID		VARCHAR2	视频ID号
 	@ApiModelProperty(value = "视频编号")
@@ -31,7 +34,7 @@ public class VideoModel implements Serializable{
 	private String tdbh;			//TDBH		VARCHAR2	通道编号
 	@ApiModelProperty(value = "通道号")
 	private String tdh;				//TDH		VARCHAR2	通道号
-	@ApiModelProperty(value = "视频类型1:mp4，2：mkv")
+	@ApiModelProperty(value = "视频类型1:mp4，2：mkv",example = "1")
 	private Integer type;			//TYPE		NUMBER		视频类型1:mp4，2：mkv
 	@ApiModelProperty(value = "是否上线")
 	private String ifonline;		//IF_ONLINE	VARCHAR2	是否上线
@@ -53,13 +56,13 @@ public class VideoModel implements Serializable{
 	private String zbx;				//ZBX		NUMBER		经度
 	@ApiModelProperty(value = "纬度")
 	private String zby;				//ZBY		NUMBER		纬度
-	@ApiModelProperty(value = "视频来源类型，如1:交警、2:消防、3:治安")
+	@ApiModelProperty(value = "视频来源类型，如1:交警、2:消防、3:治安",example = "1")
 	private Integer videotype;		//VIDEOTYPE	VARCHAR2	视频来源类型，如1:交警、2:消防、3:治安
 	@ApiModelProperty(value = "空间索引字段")
 	private String objectid;		//OBJECTID	INTEGER		空间索引字段
 	@ApiModelProperty(value = "空间字段")
 	private String shape;			//SHAPE		ST_GEOMETRY	空间字段
-	@ApiModelProperty(value = "视频存在状态，0：不存在，1：表示存在")
+	@ApiModelProperty(value = "视频存在状态，0：不存在，1：表示存在",example = "1")
 	private Integer status;			//视频存在状态，0：不存在，1：表示存在
 	@ApiModelProperty(value = "视频简介")
 	private String introduction;	//视频简介
@@ -73,7 +76,7 @@ public class VideoModel implements Serializable{
 	private String oriurl;			//上传视频存放位置
 	@ApiModelProperty(value = "视频截图（略缩图）存放位置")
 	private String thumbnailurl;	//视频截图（略缩图）存放位置
-	@ApiModelProperty(value = "排序")
+	@ApiModelProperty(value = "排序",example = "1")
 	private Integer sort; 			//排序
 	
 

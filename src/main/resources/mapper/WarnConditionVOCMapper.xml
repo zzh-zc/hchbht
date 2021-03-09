@@ -16,53 +16,6 @@
 		<result column="status" property="status" />		
 	</resultMap>
 	
-	<!-- 添加 -->
-	<insert id="insert" parameterType="WarnConditionVOC">
-		insert into tj_hchbdb_warnconditionvoc (
-			status
-			<if test="id != null and id != ''">,id</if>
-			<if test="equipmentid != null and equipmentid != ''"> , equipmentid</if>
-			<if test="hydrocarbon != null and hydrocarbon != ''">, hydrocarbon</if>
-			<if test="rate != null and rate != ''">, rate</if>
-			<if test="temperature != null and temperature != ''">, temperature</if>
-			<if test="pressure != null and pressure != ''">, pressure</if>
-			<if test="humidity != null and humidity != ''">, humidity</if>
-			<if test="wastegas != null and wastegas != ''">, wastegas</if>
-		)values(
-			1
-			<if test="id != null and id != ''">, #{id}</if>
-			<if test="equipmentid != null and equipmentid != ''"> , #{equipmentid}</if>
-			<if test="hydrocarbon != null and hydrocarbon != ''">, #{hydrocarbon}</if>
-			<if test="rate != null and rate != ''">,#{rate}</if>
-			<if test="temperature != null and temperature != ''">, #{temperature}</if>
-			<if test="pressure != null and pressure != ''">, #{pressure}</if>
-			<if test="humidity != null and humidity != ''">, #{humidity}</if>
-			<if test="wastegas != null and wastegas != ''">, #{wastegas}</if>
-		)
-	</insert>
-	
-	<!-- 修改 -->
-	<update id="update" parameterType="WarnConditionVOC">
-		update 
-			tj_hchbdb_warnconditionvoc
-		<set>
-			<if test="equipmentid != null and equipmentid != ''">equipmentid=#{equipmentid}, </if>
-			<if test="hydrocarbon != null and hydrocarbon != ''">hydrocarbon=#{hydrocarbon}, </if>
-			<if test="rate != null and rate != ''">rate=#{rate}, </if>
-			<if test="temperature != null and temperature != ''">temperature=#{temperature}, </if>
-			<if test="pressure != null and pressure != ''">pressure=#{pressure}, </if>
-			<if test="humidity != null and humidity != ''">humidity=#{humidity}, </if>
-			<if test="wastegas != null and wastegas != ''">wastegas=#{wastegas}, </if>
-			<if test="status != null">status=#{status}</if>
-		</set>
-		where id=#{id}
-	</update>
-	
-	<!-- 删除 -->
-	<delete id="delete" parameterType="string">
-		delete from tj_hchbdb_warnconditionvoc where id=#{id}
-	</delete>
-
 	<!-- 根据条件查询，单一的数据 -->
 	<select id="queryDataByCondition" parameterType="WarnConditionVOC" resultMap="WarnConditionVOCMap">
 		select w.*, c.id as companyid, c.name as companyname
@@ -112,25 +65,9 @@
 		</where>
 	</select>
 	
-	<!-- 数据长度 -->
-	<select id="datasize" parameterType="WarnConditionVOC" resultType="java.lang.Integer">
-		select count(w.id)
-		from tj_hchbdb_warnconditionvoc w
-		left join tj_hchbdb_equipment e
-			on e.eid = w.equipmentid
-		left join tj_hchbdb_companyInfo_equipment aue 
-				on e.id = aue.equipmentid 
-		left join tj_hchbdb_companyInfo c 
-			on aue.companyid = c.id
-		<where>
-			1=1
-			<if test="companyname != null and companyname != ''"> and c.name like '%${companyname}%'</if>
-		</where>
-	</select>
-	
 	<!-- 根据条件查询  Page 数据 -->
 	<select id="queryDataByConditionsPage" resultMap="WarnConditionVOCMap">
-	select w2.n, w1.* 
+	select  w1.*
 	from (
 		select w.*, c.id as companyid, c.name as companyname
 		from tj_hchbdb_warnconditionvoc w
@@ -144,7 +81,7 @@
 		where c.name like '%${w.companyname}%'
 		</if>
 	) w1, (
-		select top ${endrow} row_number() over (order by m.sort desc) n, m.id	
+		select  m.id
 		from ( 
 			select *
 			from tj_hchbdb_warnconditionvoc 
@@ -161,7 +98,7 @@
 				<if test="w.status != null"> and status=#{w.status}</if>
 			)m 
 		) w2 
-	where w1.id = w2.id and w2.n &gt; ${startrow} order by w2.n asc
+	where w1.id = w2.id
 	</select>
 	
 	<!-- 根据设备id查询相应的信息 -->

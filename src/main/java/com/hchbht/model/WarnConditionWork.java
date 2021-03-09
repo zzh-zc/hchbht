@@ -4,25 +4,29 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.io.Serializable;
 
 /**
- * 预警信息	工况		tj_hchbdb_warnconditionwork
+ * 预警条件	工况		tj_hchbdb_warnconditionwork
  * @author Administrator
  *
  */
 @Data
-@ApiModel(value = "预警信息 工况")
+@ApiModel(value = "预警条件 工况")
+@Table(name = "tj_hchbdb_warnconditionwork")
 public class WarnConditionWork implements Serializable{
 	private static final long serialVersionUID = 1L;
+	@Id
 	@ApiModelProperty(value = "主键id")
 	private String id;			//主键id
-	@ApiModelProperty(value = "排序")
+	@ApiModelProperty(value = "排序",example = "1")
 	private Integer sort;		//排序
 	@ApiModelProperty(value = "设备id")
 	private String equipmentid;	//设备id
-	@ApiModelProperty(value = "工况类型，1：voc，2：锅炉")
+	@ApiModelProperty(value = "工况类型，1：voc，2：锅炉",example = "1")
 	private Integer worktype; //工况类型，1：voc，2：锅炉
 	//TVOC 工况字段
 	@ApiModelProperty(value = "风机电流")
@@ -49,13 +53,15 @@ public class WarnConditionWork implements Serializable{
 	private String glfilmdust;			//锅炉，水膜除尘
 	@ApiModelProperty(value = "锅炉，布袋除尘")
 	private String glbagdust;			//锅炉，布袋除尘
-	@ApiModelProperty(value = "是否有效，0：无效，1：有效")
+	@ApiModelProperty(value = "是否有效，0：无效，1：有效",example = "1")
 	private Integer status;		//是否有效，0：无效，1：有效
 	
 	//非数据库字段
 	@Transient
+	@ApiModelProperty(hidden = true)
 	private String companyid;
 	@Transient
+	@ApiModelProperty(hidden = true)
 	private String companyname;
 
 

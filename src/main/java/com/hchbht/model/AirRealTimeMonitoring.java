@@ -10,6 +10,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
+import javax.persistence.Id;
+
 /**
  * 大气实时监控表 tj_hchbht_air_realtimemonitoring
  * @author Administrator
@@ -19,9 +21,10 @@ import com.alibaba.fastjson.annotation.JSONField;
 @ApiModel(value = "大气实时监控表")
 public class AirRealTimeMonitoring implements Serializable{
 	private static final long serialVersionUID = 1L;
+	@Id
 	@ApiModelProperty(value = "实时监控表id")
 	private String id;				//实时监控表id
-	@ApiModelProperty(value = "排序")
+	@ApiModelProperty(value = "排序",example = "1")
 	private Integer sort;			//排序
 	@ApiModelProperty(value = "企业编号")
 	private String companyid;		//企业编号

@@ -35,7 +35,7 @@ public class Equipment implements Serializable{
 	@ApiModelProperty(value = "主键id")
 	@Id
 	private String id;			//主键id
-	@ApiModelProperty(value = "排序")
+	@ApiModelProperty(value = "排序",example = "1")
 	private Integer sort;		//排序，自动增长
 	@ApiModelProperty(value = "设备序号")
 	private String esort;		//设备序号
@@ -43,13 +43,13 @@ public class Equipment implements Serializable{
 	private String eid;			//设备编号
 	@ApiModelProperty(value = "设备名称")
 	private String name;		//设备名称
-	@ApiModelProperty(value = "设备类型 ，1：工业废气，2：工业污水，3：油烟")
+	@ApiModelProperty(value = "设备类型 ，1：工业废气，2：工业污水，3：油烟",example = "1")
 	private Integer type;		//设备类型 ，1：工业废气，2：工业污水，3：油烟
-	@ApiModelProperty(value = "类别类型，1：voc，2：工况")
+	@ApiModelProperty(value = "类别类型，1：voc，2：工况",example = "1")
 	private Integer lstate;		//类别类型，1：voc，2：工况
-	@ApiModelProperty(value = "工况类型，1：VOC工况，2：锅炉工况")
+	@ApiModelProperty(value = "工况类型，1：VOC工况，2：锅炉工况",example = "1")
 	private Integer	tstate;		//工况类型，1：VOC工况，2：锅炉工况
-	@ApiModelProperty(value = "设备状态，0：启用，1：禁用")
+	@ApiModelProperty(value = "设备状态，0：启用，1：禁用",example = "1")
 	private Integer status;		//设备状态，0：启用，1：禁用
 	
 	//非数据库字段
@@ -60,7 +60,7 @@ public class Equipment implements Serializable{
 	@ApiModelProperty(hidden = true)
 	private String companyname;	//企业名称
 	@Transient
-	@ApiModelProperty(hidden = true)
+	@ApiModelProperty(hidden = true,example = "1")
 	private Integer isdata;		//是否有数据，0：没有，1：有
 	@Transient
 	@ApiModelProperty(hidden = true)
