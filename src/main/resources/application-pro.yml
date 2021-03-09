@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    url: jdbc:sqlserver://10.181.104.102;DatabaseName=hchbdb #������ַjdbc:sqlserver://10.181.104.102; DatabaseName=hchbdb
+    username: sa
+    password: hchb@2018 #��������hchb@2018
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect #Hibernate SQL��������
+    open-in-view: false
+  redis:
+    host: 10.181.104.101
+    port: 6379
+    database: 0
+    password: 123456
+
+#knife4j:
+#  # 开启增强配置
+#  enable: true
+#  basic:
+#    enable: true
+#    # Basic认证用户名
+#    username: admin
+#    # Basic认证密码
+#    password: admin
+
+
+

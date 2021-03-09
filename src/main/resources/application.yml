@@ -6,7 +6,7 @@ spring:
   application: #服务名
     name: hchbht
   profiles: # 环境设置：dev、test、prod
-    active: dev
+    active: pro
 
 #是否开启 swagger-ui
 swagger:
@@ -31,4 +31,4 @@ logging:
     root: info
     com.hchbht.mapper: debug
   file:
-    name: log/blog-dev.log
+    name: log/hchbht.log
