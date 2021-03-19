@@ -1,10 +1,12 @@
 package com.hchbht.server;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.Date;
 
 /**
@@ -17,6 +19,17 @@ public class MinaTcpServerYy extends IoHandlerAdapter {
     @Override
     public void messageReceived(IoSession session, Object message)
             throws Exception {
+        String clientIP = "";
+        int clientPort = 0;
+        if(StringUtils.isEmpty(String.valueOf(session.getRemoteAddress()))){
+            clientIP = (String)session.getAttribute("KEY_SESSION_CLIENT_IP");
+            clientPort = (Integer) session.getAttribute("KEY_SESSION_CLIENT_PORT");
+        }else{
+            clientIP = ((InetSocketAddress)session.getRemoteAddress()).getAddress().getHostAddress();
+            clientPort = ((InetSocketAddress)session.getRemoteAddress()).getPort();
+        }
+        System.out.println("设备IP---------- -->"  + clientIP);
+        System.out.println("设备PORT---------- -->"  + clientPort);
         String str = message.toString();
         System.out.println("油烟-----------------------油烟Message -->"  + str);
         if (str.trim().equalsIgnoreCase("quit")) {
@@ -45,6 +58,10 @@ public class MinaTcpServerYy extends IoHandlerAdapter {
     @Override
     public void sessionCreated(IoSession iosession) throws Exception {
         System.out.println("会话创建");
+        String clientIP = ((InetSocketAddress) iosession.getRemoteAddress()).getAddress().getHostAddress();
+        int clientPort = ((InetSocketAddress) iosession.getRemoteAddress()).getPort();
+        iosession.setAttribute("KEY_SESSION_CLIENT_IP", clientIP);
+        iosession.setAttribute("KEY_SESSION_CLIENT_PORT", clientPort);
         super.sessionCreated(iosession);
     }
     @Override
