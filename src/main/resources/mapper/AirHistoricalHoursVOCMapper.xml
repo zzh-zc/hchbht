@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hchbht.mapper.AirHistoricalHoursVOCMapper">
+
+	<resultMap type="AirHistoricalHoursVOC" id="AirHistoricalHoursVOCMap">
+		<id column="id" property="id" />
+		<result column="sort" property="sort" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="historicaltime" property="historicaltime" />
+		
+		<result column="hydrocarbon" property="hydrocarbon" />
+		<result column="rate" property="rate" />
+		<result column="temperature" property="temperature" />
+		<result column="pressure" property="pressure" />
+		<result column="humidity" property="humidity" />
+		<result column="wastegas" property="wastegas" />
+		<result column="speed" property="speed" />
+		
+		<result column="companyid" property="companyid" />
+		<result column="companyname" property="companyname" />
+		<result column="longitude" property="longitude" />
+		<result column="latitude" property="latitude" />
+		<result column="btime" property="btime" />
+	</resultMap>
+	
+	<resultMap type="TjHchbdbCompanyInfo" id="CompanyInfoMap2">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="eid" property="eid" />
+		<result column="isAvailable" property="isAvailable" />
+		
+		<collection property="hvoc" javaType="ArrayList" column="eid" ofType="AirHistoricalHoursVOC" select="queryLastDataByEquipmentid"/>
+	</resultMap>
+	
+	<!-- 添加 -->
+	<insert id="insert" parameterType="AirHistoricalHoursVOC">
+		insert into tj_hchbdb_air_historicalhoursvoc(
+			<if test="id != null and id != ''">id</if>
+			<if test="equipmentid != null and equipmentid != ''">, equipmentid</if>
+			<if test="historicaltime != null and historicaltime != ''">, historicaltime</if>
+			<if test="hydrocarbon != null and hydrocarbon != ''">, hydrocarbon</if>
+			<if test="rate != null and rate != ''">, rate</if>
+			<if test="temperature != null and temperature != ''">, temperature</if>
+			<if test="pressure != null and pressure != ''">, pressure</if>
+			<if test="humidity != null and humidity != ''">, humidity</if>
+			<if test="wastegas != null and wastegas != ''">, wastegas</if>
+			<if test="speed != null and speed != ''">, speed</if>
+		)values(
+			<if test="id != null and id != ''">#{id}</if>
+			<if test="equipmentid != null and equipmentid != ''">,#{equipmentid}</if>
+			<if test="historicaltime != null and historicaltime != ''">, #{historicaltime}</if>
+			<if test="hydrocarbon != null and hydrocarbon != ''">, #{hydrocarbon}</if>
+			<if test="rate != null and rate != ''">, #{rate}</if>
+			<if test="temperature != null and temperature != ''">, #{temperature}</if>
+			<if test="pressure != null and pressure != ''">, #{pressure}</if>
+			<if test="humidity != null and humidity != ''">, #{humidity}</if>
+			<if test="wastegas != null and wastegas != ''">, #{wastegas}</if>
+			<if test="speed != null and speed != ''">, #{speed}</if>
+		)
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="update" parameterType="AirHistoricalHoursVOC">
+		update 
+			tj_hchbdb_air_historicalhoursvoc
+		<set>
+			<if test="equipmentid != null and equipmentid != ''">equipmentid=#{equipmentid}</if>
+			<if test="historicaltime != null and historicaltime != ''">,historicaltime=#{historicaltime}</if>
+			<if test="hydrocarbon != null and hydrocarbon != ''">, hydrocarbon=#{hydrocarbon}</if>
+			<if test="rate != null and rate != ''">, rate=#{rate}</if>
+			<if test="temperature != null and temperature != ''">, temperature=#{temperature}</if>
+			<if test="pressure != null and pressure != ''">, pressure=#{pressure}</if>
+			<if test="humidity != null and humidity != ''">, humidity=#{humidity}</if>
+			<if test="wastegas != null and wastegas != ''">, wastegas=#{wastegas}</if>
+			<if test="speed != null and speed != ''">, speed=#{speed}</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<!-- 删除 -->
+	<delete id="delete" parameterType="string">
+		delete from tj_hchbdb_air_historicalhoursvoc where id=#{id}
+	</delete>
+
+	<!-- 根据条件查询，单一的数据 -->
+	<select id="queryDataByCondition" parameterType="AirHistoricalHoursVOC" resultMap="AirHistoricalHoursVOCMap">
+		select * from tj_hchbdb_air_historicalhoursvoc
+		<where>
+			1=1
+			<if test="id != null and id != ''"> and id=#{id}</if>
+			<if test="equipmentid != null and equipmentid != ''"> and equipmentid=#{equipmentid}</if>
+			<if test="historicaltime != null and historicaltime != ''"> and historicaltime=#{historicaltime}</if>
+			<if test="hydrocarbon != null and hydrocarbon != ''"> and hydrocarbon=#{hydrocarbon}</if>
+			<if test="rate != null and rate != ''"> and rate=#{rate}</if>
+			<if test="temperature != null and temperature != ''"> and temperature=#{temperature}</if>
+			<if test="pressure != null and pressure != ''"> and pressure=#{pressure}</if>
+			<if test="humidity != null and humidity != ''"> and humidity=#{humidity}</if>
+			<if test="wastegas != null and wastegas != ''"> and wastegas=#{wastegas}</if>
+			<if test="speed != null and speed != ''"> and speed=#{speed}</if>
+		</where>
+	</select>
+	
+	<!-- 数据总量 -->
+	<select id="queryDataSize" resultType="java.lang.Integer">
+		select count(*) 
+		from (
+			select m.id as id
+			from tj_hchbdb_air_historicalhoursvoc m 
+			left join tj_hchbdb_equipment e
+				on m.equipmentid = e.eid
+			left join tj_hchbdb_companyInfo_equipment aue 
+				on e.id = aue.equipmentid 
+			left join tj_hchbdb_companyInfo u 
+				on aue.companyid = u.id
+			<where>
+				1=1 and aue.status = 0
+				<if test="name != null and name != ''"> and u.name like '%${name}%'</if>
+				<if test="searchTime != null and searchTime != ''">
+					and convert(VARCHAR(20), m.historicaltime, 23) <![CDATA[ >= ]]> cast(#{sd} as DATETIME)
+						and convert(VARCHAR(20), m.historicaltime, 23) <![CDATA[ <= ]]> cast(#{ed} as DATETIME)
+				</if>
+			</where>
+		) m
+	</select>
+	
+	<!-- 根据条件查询，list数据，分页 -->
+	<select id="queryDataByConditionsPage" resultMap="AirHistoricalHoursVOCMap">	
+	select w1.*
+	from (
+		select m.id as id, m.sort as sort, m.equipmentid as equipmentid, m.historicaltime as historicaltime, m.hydrocarbon as hydrocarbon, 
+			m.rate as rate, m.temperature as temperature, m.pressure as pressure, m.humidity as humidity, m.wastegas as wastegas, 
+			m.speed as speed, u.id as companyid, u.name as companyname,u.longitude as longitude, u.latitude as latitude
+		from tj_hchbdb_air_historicalhoursvoc m 
+		left join tj_hchbdb_equipment e
+			on m.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment aue 
+			on e.id = aue.equipmentid 
+		left join tj_hchbdb_companyInfo u 
+			on aue.companyid = u.id
+		<where>
+			1=1 and aue.status = 0
+			<if test="companyInfo.name != null and companyInfo.name != ''"> and u.name like '%${companyInfo.name}%'</if>
+		</where>
+	) w1 
+	left join (
+		select m.id
+		from ( 
+			select *
+			from tj_hchbdb_air_historicalhoursvoc 
+			where
+				1=1
+				<if test="companyInfo.eid != null and companyInfo.eid != ''">  and equipmentid = #{companyInfo.eid} </if>
+				<if test="companyInfo.searchTime != null and companyInfo.searchTime != ''">
+					and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ >= ]]> cast(#{companyInfo.sd} as DATETIME)
+					and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ <= ]]> cast(#{companyInfo.ed} as DATETIME)
+				</if>
+			)m 
+		) w2 
+	on w1.id = w2.id
+	where 1=1
+	</select>
+	
+	<select id="queryLastDataVoc" parameterType="TjHchbdbCompanyInfo" resultType="AirHistoricalHoursVOC">
+		select emec.cname as companyname, w.* 
+		from (select * 
+				from (select  equipmentid,historicaltime 
+					from tj_hchbdb_air_historicalhoursvoc      
+					where historicaltime = (select top 1 historicaltime 
+											from tj_hchbdb_air_historicalhoursvoc order by historicaltime desc)     
+					group by equipmentid, historicaltime    ) em    
+				left join    (select e.eid as eid,c.name as cname 
+								from tj_hchbdb_equipment e     
+								left join tj_hchbdb_companyInfo_equipment ce on e.id = ce.equipmentid     
+								left join tj_hchbdb_companyInfo c on c.id = ce.companyid
+								where ce.status = 0    ) ec 
+				on ec.eid = em.equipmentid         
+				<if test="name != null and name != ''">
+					where ec.cname like '%${name}%'
+				</if>
+				) emec   
+		left join  tj_hchbdb_air_historicalhoursvoc  w 
+			on emec.equipmentid = w.equipmentid and emec.historicaltime = w.historicaltime   
+		where  emec.cname is not null
+		order by emec.cname desc
+	</select>
+	
+	<select id="queryWorkComapny" parameterType="TjHchbdbCompanyInfo" resultMap="CompanyInfoMap2">
+		select c.id,c.name,e.eid,c.isAvailable
+		from tj_hchbdb_companyInfo c
+		left join tj_hchbdb_companyInfo_equipment ce
+			on c.id = ce.companyid
+		left join tj_hchbdb_equipment e
+			on ce.equipmentid = e.id
+		<where>
+			ce.status = 0
+			<if test="stype == 1"> and e.eid like '%V'</if>
+			<if test="stype == 2"> and e.eid like '%G'</if>
+			<if test="stype == 3"> and e.eid like '%Y'</if>
+			<if test="id != null and id != ''"> and c.id = #{id} </if>
+			<if test="name != null and name != ''"> and c.name like '%${name}%'</if>
+		</where>
+	</select>
+	
+	<select id="queryLastDataByEquipmentid" parameterType="java.lang.String" resultType="AirHistoricalHoursVOC">		
+		select w.*,c.name as companyname
+		from tj_hchbdb_air_historicalhoursvoc w 
+		left join tj_hchbdb_equipment e 
+			on w.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment ce 
+			on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c 
+			on ce.companyid = c.id
+		where 
+			w.equipmentid = #{equipmentid} and c.name is not null
+			and w.historicaltime = (select top 1 historicaltime 
+									from tj_hchbdb_air_historicalhoursvoc 
+									where equipmentid = #{equipmentid}
+									order by historicaltime desc)
+	</select>
+	
+	<select id="queryBaoBiao" resultType="AirHistoricalHoursVOC">
+	
+	<if test="bbtype == 1">
+	select w.*,c.name as companyname, c.id as companyid
+		from tj_hchbdb_air_historicalminutesvoc w 
+		left join tj_hchbdb_equipment e 
+			on w.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment ce 
+			on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c 
+			on ce.companyid = c.id
+		where 
+			w.equipmentid = #{equipmentid} and c.name is not null
+			and convert(VARCHAR(100), w.historicaltime, 25) <![CDATA[ >= ]]> cast(#{sd} as DATETIME)
+			and convert(VARCHAR(100), w.historicaltime, 25) <![CDATA[ < ]]> cast(#{ed} as DATETIME)
+		order by w.historicaltime desc
+	</if>
+	<if test="bbtype == 2">
+	select m.*
+	from (
+		select w.*, c.id as companyid, c.name as companyname
+		from (
+			select equipmentid,
+				cast(substring(convert(varchar(100),historicaltime,23),1,19) as datetime) as  historicaltime, 
+				cast(cast(avg(cast(hydrocarbon as numeric(10,3))) as numeric(10,3)) as varchar) hydrocarbon, 
+				cast(cast(avg(cast(rate as numeric(10,3))) as numeric(10,3)) as varchar) rate, 
+				cast(cast(avg(cast(temperature as numeric(10,3))) as numeric(10,3)) as varchar) temperature, 
+				cast(cast(avg(cast(pressure as numeric(10,3))) as numeric(10,3)) as varchar) pressure, 
+				cast(cast(avg(cast(humidity as numeric(10,3))) as numeric(10,3)) as varchar) humidity, 
+				cast(cast(avg(cast(wastegas as numeric(10,3))) as numeric(10,3)) as varchar) wastegas,
+				cast(cast(avg(cast(speed as numeric(10,3))) as numeric(10,3)) as varchar) speed
+			from tj_hchbdb_air_historicalhoursvoc
+			<where>
+				<if test="equipmentid != null and equipmentid != ''">  and equipmentid = #{equipmentid} </if>
+				and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ >= ]]> cast(#{sd} as DATETIME)
+				and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ <= ]]> cast(#{ed} as DATETIME)
+			</where> 
+			group by convert(varchar(100),historicaltime,23), equipmentid
+		) w 
+		left join tj_hchbdb_equipment e 
+			on w.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment ce 
+			on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c 
+			on ce.companyid = c.id
+		where c.name is not null
+	) m
+	order by m.historicaltime desc
+	</if>
+	<if test="bbtype == 3">
+	select m.*
+	from (
+		select w.*, c.id as companyid, c.name as companyname
+		from (
+			select equipmentid,
+				cast(substring(convert(varchar(100),historicaltime,23),1,19) as datetime) as  historicaltime, 
+				cast(cast(avg(cast(hydrocarbon as numeric(10,3))) as numeric(10,3)) as varchar) hydrocarbon, 
+				cast(cast(avg(cast(rate as numeric(10,3))) as numeric(10,3)) as varchar) rate, 
+				cast(cast(avg(cast(temperature as numeric(10,3))) as numeric(10,3)) as varchar) temperature, 
+				cast(cast(avg(cast(pressure as numeric(10,3))) as numeric(10,3)) as varchar) pressure, 
+				cast(cast(avg(cast(humidity as numeric(10,3))) as numeric(10,3)) as varchar) humidity, 
+				cast(cast(avg(cast(wastegas as numeric(10,3))) as numeric(10,3)) as varchar) wastegas,
+				cast(cast(avg(cast(speed as numeric(10,3))) as numeric(10,3)) as varchar) speed
+			from tj_hchbdb_air_historicalhoursvoc
+			<where>
+				<if test="equipmentid != null and equipmentid != ''">  and equipmentid = #{equipmentid} </if>
+				and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ >= ]]> cast(#{sd} as DATETIME)
+				and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ <= ]]> cast(#{ed} as DATETIME)
+			</where> 
+			group by convert(varchar(100),historicaltime,23), equipmentid
+		) w 
+		left join tj_hchbdb_equipment e 
+			on w.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment ce 
+			on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c 
+			on ce.companyid = c.id
+		where c.name is not null
+	) m
+	order by m.historicaltime desc
+	</if>
+	<if test="bbtype == 4">
+	select m.*
+	from (
+		select w.*, c.name as companyname
+		from (
+			select equipmentid,
+				year(historicaltime) years, month(historicaltime) months,
+				cast(year(historicaltime) as varchar)+'-'+cast(month(historicaltime) as varchar) btime, 
+				cast(cast(avg(cast(hydrocarbon as numeric(10,3))) as numeric(10,3)) as varchar) hydrocarbon, 
+				cast(cast(avg(cast(rate as numeric(10,3))) as numeric(10,3)) as varchar) rate, 
+				cast(cast(avg(cast(temperature as numeric(10,3))) as numeric(10,3)) as varchar) temperature, 
+				cast(cast(avg(cast(pressure as numeric(10,3))) as numeric(10,3)) as varchar) pressure, 
+				cast(cast(avg(cast(humidity as numeric(10,3))) as numeric(10,3)) as varchar) humidity, 
+				cast(cast(avg(cast(wastegas as numeric(10,3))) as numeric(10,3)) as varchar) wastegas,
+				cast(cast(avg(cast(speed as numeric(10,3))) as numeric(10,3)) as varchar) speed
+			from tj_hchbdb_air_historicalhoursvoc
+			<where>
+				<if test="equipmentid != null and equipmentid != ''">  and equipmentid = #{equipmentid} </if>
+				and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ >= ]]> cast(#{sd} as DATETIME)
+				and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ <= ]]> cast(#{ed} as DATETIME)
+			</where> 
+			group by year(historicaltime), month(historicaltime), equipmentid
+		) w 
+		left join tj_hchbdb_equipment e 
+			on w.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment ce 
+			on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c 
+			on ce.companyid = c.id
+		where c.name is not null
+	) m
+	order by m.years desc
+	</if>
+	<if test="bbtype == 5">
+	select m.*
+	from (
+		select w.*, c.name as companyname
+		from (
+			select equipmentid,
+				year(historicaltime) years, month(historicaltime) months,
+				cast(year(historicaltime) as varchar)+'-'+cast(month(historicaltime) as varchar) btime, 
+				cast(cast(avg(cast(hydrocarbon as numeric(10,3))) as numeric(10,3)) as varchar) hydrocarbon, 
+				cast(cast(avg(cast(rate as numeric(10,3))) as numeric(10,3)) as varchar) rate, 
+				cast(cast(avg(cast(temperature as numeric(10,3))) as numeric(10,3)) as varchar) temperature, 
+				cast(cast(avg(cast(pressure as numeric(10,3))) as numeric(10,3)) as varchar) pressure, 
+				cast(cast(avg(cast(humidity as numeric(10,3))) as numeric(10,3)) as varchar) humidity, 
+				cast(cast(avg(cast(wastegas as numeric(10,3))) as numeric(10,3)) as varchar) wastegas,
+				cast(cast(avg(cast(speed as numeric(10,3))) as numeric(10,3)) as varchar) speed
+			from tj_hchbdb_air_historicalhoursvoc
+			<where>
+				<if test="equipmentid != null and equipmentid != ''">  and equipmentid = #{equipmentid} </if>
+				and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ >= ]]> cast(#{sd} as DATETIME)
+				and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ <= ]]> cast(#{ed} as DATETIME)
+			</where> 
+			group by year(historicaltime), month(historicaltime), equipmentid
+		) w 
+		left join tj_hchbdb_equipment e 
+			on w.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment ce 
+			on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c 
+			on ce.companyid = c.id
+		where c.name is not null
+	) m
+	order by m.years desc
+	</if>
+	</select>
+</mapper>

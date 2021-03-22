@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hchbht.mapper.HistoricalHoursMapper">
+
+	<!-- voc 历史小时数据，先根据条件查询，企业信息-->
+	<resultMap type="TjHchbdbCompanyInfo" id="CompanyInfoMapVOC">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="type" property="type" />
+		<result column="mtype" property="mtype" />
+		<result column="ctype" property="ctype" />
+		<result column="longitude" property="longitude" />
+		<result column="latitude" property="latitude" />
+		<result column="sort" property="sort" />
+		<collection property="hvoc" javaType="ArrayList" column="id" ofType="AirHistoricalHoursVOC" select="queryOnlyHistoricalHoursVOC"/>
+	</resultMap>
+	<!-- voc 再根据设备eid，查询最新的历史数据 -->
+	<resultMap type="AirHistoricalHoursVOC" id="AirHistoricalHoursVOCMap">
+		<id column="id" property="id" />
+		<result column="sort" property="sort" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="historicaltime" property="historicaltime" />
+		<result column="hydrocarbon" property="hydrocarbon" />
+		<result column="rate" property="rate" />
+		<result column="temperature" property="temperature" />
+		<result column="pressure" property="pressure" />
+		<result column="humidity" property="humidity" />
+		<result column="wastegas" property="wastegas" />
+		<result column="direction" property="direction" />
+		<result column="speed" property="speed" />
+	</resultMap>
+	
+	<!-- 油烟  历史小时数据，先根据条件查询，企业信息-->
+	<resultMap type="TjHchbdbCompanyInfo" id="CompanyInfoMapLamp">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="type" property="type" />
+		<result column="mtype" property="mtype" />
+		<result column="ctype" property="ctype" />
+		<result column="longitude" property="longitude" />
+		<result column="latitude" property="latitude" />
+		<result column="sort" property="sort" />
+		<collection property="hlamp" javaType="ArrayList" column="id" ofType="LampblackHistoricalHoursValue" select="queryOnlyLampblackHistoricalHoursValue"/>
+	</resultMap>
+	<!-- 油烟  再根据设备eid，查询最新的历史小时数据 -->
+	<resultMap type="LampblackHistoricalHoursValue" id="LampblackHistoricalHoursValueMap">
+		<id column="id" property="id" />
+		<result column="sort" property="sort" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="probeid" property="probeid" />
+		<result column="historicaltime" property="historicaltime" />
+		<result column="concentration" property="concentration" />
+		<result column="fanstate" property="fanstate" />
+		<result column="purifierstate" property="purifierstate" />
+		<result column="purifiercurrent" property="purifiercurrent" />
+		<result column="temperature" property="temperature" />
+	</resultMap>
+	
+	<!-- 工况， 历史小时数据，先根据条件查询，企业信息-->
+	<resultMap type="TjHchbdbCompanyInfo" id="CompanyInfoMapWork">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="type" property="type" />
+		<result column="mtype" property="mtype" />
+		<result column="ctype" property="ctype" />
+		<result column="longitude" property="longitude" />
+		<result column="latitude" property="latitude" />
+		<result column="sort" property="sort" />
+		<collection property="hwork" javaType="ArrayList" column="id" ofType="WorkingHistoricalHoursValue" select="queryOnlyWorkingHistoricalHoursValue"/>
+	</resultMap>
+	<!-- 工况，  再根据设备eid，查询最新的实时数据 -->
+	<resultMap type="WorkingHistoricalHoursValue" id="WorkingHistoricalHoursValueMap">
+		<id column="id" property="id" />
+		<result column="sort" property="sort" />
+		<result column="workingtype" property="workingtype" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="historicaltime" property="historicaltime" />
+		<collection property="list" javaType="ArrayList" column="id" ofType="WorkingHistoricalHoursValue" select="queryDataSecond"/>
+	</resultMap>
+	<!-- 二级查询 -->
+	<resultMap type="WorkingHistoricalHoursValue" id="WorkingHistoricalHoursValueMap2">
+		<id column="id" property="id" />
+		<result column="sort" property="sort" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="probeid" property="probeid" />
+		<result column="totalcurrent" property="totalcurrent" />
+		<result column="pointscurrent" property="pointscurrent" />
+		<result column="adsorption" property="adsorption" />
+		<result column="gleledust" property="gleledust" />
+		<result column="glfilmdust" property="glfilmdust" />
+		<result column="glbagdust" property="glbagdust" />
+		<collection property="list" javaType="ArrayList" column="id" ofType="WorkingConditionValue" select="queryDataThird"/>
+	</resultMap>
+	<!-- 三级查询 -->
+	<resultMap type="WorkingHistoricalHoursValue" id="WorkingHistoricalHoursValueMap3">
+		<id column="id" property="id" />
+		<result column="sort" property="sort" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="equipmentname" property="equipmentname" />
+		<result column="probeid" property="probeid" />
+		<!-- TVOC字段 -->
+		<result column="fancurrent" property="fancurrent" />
+		<result column="fanstate" property="fanstate" />
+		<result column="vocwpcurrent" property="vocwpcurrent" />
+		<result column="vocwpstate" property="vocwpstate" />
+		<!-- 锅炉字段 -->
+		<result column="yfan" property="yfan" />
+		<result column="yfanstate" property="yfanstate" />
+		<result column="gfan" property="gfan" />
+		<result column="gfanstate" property="gfanstate" />
+		<result column="glwpcurrent" property="glwpcurrent" />
+		<result column="glwpstate" property="glwpstate" />
+	</resultMap>
+	
+	<!--voc 历史小时数据，先根据条件查询，企业信息 -->
+	<select id="queryDataHistoricalHoursVOC" parameterType="TjHchbdbCompanyInfo" resultMap="CompanyInfoMapVOC">
+		select m.id, m.name, m.type, m.mtype, m.ctype, m.longitude, m.latitude, m.sort
+		from tj_hchbdb_companyInfo m
+		<where>
+			1=1
+			<if test="id != null and id != ''"> and id = #{id} </if>
+			<if test="name != null and name != ''"> and name like '%${name}%'</if>
+			<if test="address != null and address != ''"> and address like '%${address}%'</if>
+			<if test="contactName != null and contactName != ''"> and contactName like '%${contactName}%'</if>
+			<if test="contactPhone != null and contactPhone != ''"> and contactPhone = #{contactPhone}</if>
+			<if test="boilerCapacity != null and boilerCapacity != ''"> and boilerCapacity = #{boilerCapacity}</if>
+			<if test="purifierstate != null"> and purifierstate = #{purifierstate}</if>
+			<if test="units != null"> and units = #{units}</if>
+			<if test="type != null"> and type = #{type}</if>
+			<if test="isAvailable != null"> and isAvailable = #{isAvailable}</if>
+			<if test="sort != null"> and sort = #{sort}</if>
+			<if test="longitude != null and longitude != ''"> and longitude = #{longitude}</if>
+			<if test="latitude != null and latitude != ''"> and latitude = #{latitude}</if>
+			<if test="mtype != null"> and mtype = #{mtype}</if>
+			<if test="ctype != null"> and ctype = #{ctype}</if>
+		</where>
+	</select>
+	<!-- voc 再根据设备eid，查询最新的历史小时数据 -->
+	<select id="queryOnlyHistoricalHoursVOC" parameterType="String" resultMap="AirHistoricalHoursVOCMap">
+		select top 1 m.*
+		from tj_hchbdb_air_historicalhoursvoc m 
+		left join tj_hchbdb_equipment e
+			on m.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment ce
+			on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c
+			on ce.companyid = c.id
+		<where>
+			datediff(day, m.historicaltime, getdate()) = 0
+			and c.id = #{id}
+		</where> 
+		order by m.historicaltime desc
+	</select>
+	
+	<!--油烟  历史小时数据，先根据条件查询，企业信息 -->
+	<select id="queryDataLampblackHistoricalHoursValue" parameterType="TjHchbdbCompanyInfo" resultMap="CompanyInfoMapLamp">
+		select m.id, m.name, m.type, m.mtype, m.ctype, m.longitude, m.latitude, m.sort
+		from tj_hchbdb_companyInfo m
+		<where>
+			1=1
+			<if test="id != null and id != ''"> and id = #{id} </if>
+			<if test="name != null and name != ''"> and name like '%${name}%'</if>
+			<if test="address != null and address != ''"> and address like '%${address}%'</if>
+			<if test="contactName != null and contactName != ''"> and contactName like '%${contactName}%'</if>
+			<if test="contactPhone != null and contactPhone != ''"> and contactPhone = #{contactPhone}</if>
+			<if test="boilerCapacity != null and boilerCapacity != ''"> and boilerCapacity = #{boilerCapacity}</if>
+			<if test="purifierstate != null"> and purifierstate = #{purifierstate}</if>
+			<if test="units != null"> and units = #{units}</if>
+			<if test="type != null"> and type = #{type}</if>
+			<if test="isAvailable != null"> and isAvailable = #{isAvailable}</if>
+			<if test="sort != null"> and sort = #{sort}</if>
+			<if test="longitude != null and longitude != ''"> and longitude = #{longitude}</if>
+			<if test="latitude != null and latitude != ''"> and latitude = #{latitude}</if>
+			<if test="mtype != null"> and mtype = #{mtype}</if>
+			<if test="ctype != null"> and ctype = #{ctype}</if>
+		</where>
+	</select>
+	<!-- 油烟 再根据设备eid，查询最新的历史小时数据 -->
+	<select id="queryOnlyLampblackHistoricalHoursValue" parameterType="String" resultMap="LampblackHistoricalHoursValueMap">
+		select top 1 m.*
+		from tj_hchbdb_lampblack_historicalhoursvalue m 
+		left join tj_hchbdb_equipment e
+			on m.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment ce
+			on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c
+			on ce.companyid = c.id
+		<where>
+			datediff(day, m.historicaltime, getdate()) = 0
+			and c.id = #{id}
+		</where> 
+		order by m.historicaltime desc
+	</select>
+	
+	<!--工况， 历史小时数据，先根据条件查询，企业信息 -->
+	<select id="queryDataWorkingHistoricalHoursValue" parameterType="TjHchbdbCompanyInfo" resultMap="CompanyInfoMapWork">
+		select m.id, m.name, m.type, m.mtype, m.ctype, m.longitude, m.latitude, m.sort
+		from tj_hchbdb_companyInfo m
+		<where>
+			1=1
+			<if test="id != null and id != ''"> and id = #{id} </if>
+			<if test="name != null and name != ''"> and name like '%${name}%'</if>
+			<if test="address != null and address != ''"> and address like '%${address}%'</if>
+			<if test="contactName != null and contactName != ''"> and contactName like '%${contactName}%'</if>
+			<if test="contactPhone != null and contactPhone != ''"> and contactPhone = #{contactPhone}</if>
+			<if test="boilerCapacity != null and boilerCapacity != ''"> and boilerCapacity = #{boilerCapacity}</if>
+			<if test="purifierstate != null"> and purifierstate = #{purifierstate}</if>
+			<if test="units != null"> and units = #{units}</if>
+			<if test="type != null"> and type = #{type}</if>
+			<if test="isAvailable != null"> and isAvailable = #{isAvailable}</if>
+			<if test="sort != null"> and sort = #{sort}</if>
+			<if test="longitude != null and longitude != ''"> and longitude = #{longitude}</if>
+			<if test="latitude != null and latitude != ''"> and latitude = #{latitude}</if>
+			<if test="mtype != null"> and mtype = #{mtype}</if>
+			<if test="ctype != null"> and ctype = #{ctype}</if>
+		</where>
+	</select>
+	<!-- 工况，再根据设备eid，查询最新的实时数据 -->
+	<select id="queryOnlyWorkingHistoricalHoursValue" parameterType="String" resultMap="WorkingHistoricalHoursValueMap">
+		select top 1 m.id as id, m.sort as sort, m.equipmentid as equipmentid, m.historicaltime as historicaltime
+		from tj_hchbdb_working_historicalhoursvalue m 
+		left join tj_hchbdb_equipment e
+			on m.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment ce
+			on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c
+			on ce.companyid = c.id
+		<where>
+			datediff(day, m.historicaltime, getdate()) = 0
+			and c.id = #{id}
+		</where> 
+		order by m.historicaltime desc
+	</select>
+	<!-- 查询二级数据 -->
+	<select id="queryDataSecond" parameterType="java.lang.String" resultMap="WorkingHistoricalHoursValueMap2">	
+		select m.id as id, m.sort as sort, m.equipmentid as equipmentid, m.probeid as probeid, m.totalcurrent as totalcurrent, 
+			m.pointscurrent as pointscurrent, m.adsorption as adsorption,  m.gleledust as gleledust, m.glfilmdust as glfilmdust,
+			m.glbagdust as glbagdust
+		from tj_hchbdb_working_historicalhoursvalue m  
+		<where>
+			1=1<if test="equipmentid != null and equipmentid != ''"> and equipmentid=#{equipmentid}</if>
+		</where>
+	</select>
+	<!-- 查询三级数据 -->
+	<select id="queryDataThird" parameterType="java.lang.String" resultMap="WorkingHistoricalHoursValueMap3">	
+		select m.id as id, m.sort as sort, m.equipmentid as equipmentid, m.equipmentname as equipmentname, m.probeid as probeid,
+			m.fancurrent as fancurrent,m.fanstate as fanstate,	m.vocwpcurrent as vocwpcurrent, m.vocwpstate as vocwpstate, m.yfan as yfan, 
+			m.yfanstate as yfanstate, m.gfan as gfan,m.gfanstate as gfanstate, m.glwpcurrent as glwpcurrent, m.glwpstate as glwpstate
+		from tj_hchbdb_working_historicalhoursvalue m  
+		<where>
+			1=1
+			<if test="equipmentid != null and equipmentid != ''"> and equipmentid=#{equipmentid}</if>
+		</where>
+	</select>
+</mapper>

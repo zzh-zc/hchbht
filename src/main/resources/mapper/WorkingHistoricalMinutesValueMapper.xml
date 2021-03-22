@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hchbht.mapper.WorkingHistoricalMinutesValueMapper">
+
+	<resultMap type="WorkingHistoricalMinutesValue" id="WorkingHistoricalMinutesValueMap">
+		<id column="id" property="id" />
+		<result column="sort" property="sort" />
+		<result column="workingtype" property="workingtype" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="equipmentname" property="equipmentname" />
+		<result column="probeid" property="probeid" />
+		<result column="historicaltime" property="historicaltime" />
+		<!-- TVOC字段 -->
+		<result column="fancurrent" property="fancurrent" />
+		<result column="fanstate" property="fanstate" />
+		<result column="vocwpcurrent" property="vocwpcurrent" />
+		<result column="vocwpstate" property="vocwpstate" />
+		<!-- TVOC 、 锅炉公用字段 -->
+		<!-- <result column="totalcurrent" property="totalcurrent" />
+		<result column="pointscurrent" property="pointscurrent" /> -->
+		<result column="adsorption" property="adsorption" />
+		<!-- 锅炉字段 -->
+		<result column="yfan" property="yfan" />
+		<result column="yfanstate" property="yfanstate" />
+		<result column="gfan" property="gfan" />
+		<result column="gfanstate" property="gfanstate" />
+		<result column="glwpcurrent" property="glwpcurrent" />
+		<result column="glwpstate" property="glwpstate" /> 
+		<!-- <result column="gleledust" property="gleledust" /> -->
+		<result column="glfilmdust" property="glfilmdust" />
+		<result column="glbagdust" property="glbagdust" />
+		<!-- 非数据库字段 -->
+		<result column="companyid" property="companyid" />
+		<result column="companyname" property="companyname" />
+		<result column="longitude" property="longitude" />
+		<result column="latitude" property="latitude" />
+	</resultMap>
+	
+	<resultMap type="TjHchbdbCompanyInfo" id="CompanyInfoMap2">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="eid" property="eid" />
+		<result column="isAvailable" property="isAvailable" />
+		
+		<collection property="mwork" javaType="ArrayList" column="eid" ofType="WorkingHistoricalMinutesValue" select="queryLastDataByEquipmentid"/>
+	</resultMap>
+	
+	<!-- 一级查询 -->
+	<resultMap type="WorkingHistoricalMinutesValue" id="WorkingHistoricalMinutesValueMap1">
+		<id column="id" property="id" />
+		<result column="sort" property="sort" />
+		<result column="workingtype" property="workingtype" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="historicaltime" property="historicaltime" />
+		<collection property="list" javaType="ArrayList" column="id" ofType="WorkingHistoricalMinutesValue" select="queryDataSecond"/>
+	</resultMap>
+	<!-- 二级查询 -->
+	<resultMap type="WorkingHistoricalMinutesValue" id="WorkingHistoricalMinutesValueMap2">
+		<id column="id" property="id" />
+		<result column="sort" property="sort" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="probeid" property="probeid" />
+		<result column="totalcurrent" property="totalcurrent" />
+		<result column="pointscurrent" property="pointscurrent" />
+		<result column="adsorption" property="adsorption" />
+		<result column="gleledust" property="gleledust" />
+		<result column="glfilmdust" property="glfilmdust" />
+		<result column="glbagdust" property="glbagdust" />
+		
+		<collection property="list" javaType="ArrayList" column="id" ofType="WorkingHistoricalMinutesValue" select="queryDataThird"/>
+	</resultMap>
+	<!-- 三级查询 -->
+	<resultMap type="WorkingHistoricalMinutesValue" id="WorkingHistoricalMinutesValueMap3">
+		<id column="id" property="id" />
+		<result column="sort" property="sort" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="equipmentname" property="equipmentname" />
+		<result column="probeid" property="probeid" />
+		<!-- TVOC字段 -->
+		<result column="fancurrent" property="fancurrent" />
+		<result column="fanstate" property="fanstate" />
+		<result column="vocwpcurrent" property="vocwpcurrent" />
+		<result column="vocwpstate" property="vocwpstate" />
+		<!-- 锅炉字段 -->
+		<result column="yfan" property="yfan" />
+		<result column="yfanstate" property="yfanstate" />
+		<result column="gfan" property="gfan" />
+		<result column="gfanstate" property="gfanstate" />
+		<result column="glwpcurrent" property="glwpcurrent" />
+		<result column="glwpstate" property="glwpstate" />
+	</resultMap>
+	
+	<!-- 添加 -->
+	<insert id="insert" parameterType="WorkingHistoricalMinutesValue">
+		insert into tj_hchbdb_working_historicalminutesvalue(
+			<if test="id != null and id != ''">id</if>
+			<if test="workingtype != null">, workingtype</if>
+			<if test="equipmentid != null and equipmentid != ''">, equipmentid</if>
+			<if test="equipmentname != null  and equipmentname != ''">, equipmentname</if>
+			<if test="probeid != null and probeid != ''">, probeid</if>
+			<if test="historicaltime != null and historicaltime != ''">, historicaltime</if>
+			<if test="fancurrent != null and fancurrent != ''">, fancurrent</if>
+			<if test="fanstate != null">, fanstate</if>
+			<if test="vocwpcurrent != null and vocwpcurrent != ''">, vocwpcurrent</if>
+			<if test="vocwpstate != null">, vocwpstate</if>
+			
+			<if test="totalcurrent != null and totalcurrent != ''">, totalcurrent</if>
+			<if test="pointscurrent != null and pointscurrent != ''">, pointscurrent</if>
+			<if test="adsorption != null and adsorption != ''">, adsorption</if>
+			
+			<if test="yfan != null and yfan != ''">, yfan</if>
+			<if test="yfanstate != null">, yfanstate</if>
+			<if test="gfan != null and gfan != ''">, gfan</if>
+			<if test="gfanstate != null">, gfanstate</if>
+			<if test="glwpcurrent != null and glwpcurrent != ''">, glwpcurrent</if>
+			<if test="glwpstate != null">, glwpstate</if>
+			
+			<if test="gleledust != null and gleledust != ''">, gleledust</if>
+			<if test="glfilmdust != null and glfilmdust != ''">, glfilmdust</if>
+			<if test="glbagdust != null and glbagdust != ''">, glbagdust</if>
+		)values(
+			<if test="id != null and id != ''">#{id}</if>
+			<if test="workingtype != null">, #{workingtype}</if>
+			<if test="equipmentid != null and equipmentid != ''">,#{equipmentid}</if>
+			<if test="equipmentname != null and equipmentname != ''">,#{equipmentname}</if>
+			<if test="probeid != null and probeid != ''">,#{probeid}</if>
+			<if test="historicaltime != null and historicaltime != ''">,#{historicaltime}</if>
+			<if test="fancurrent != null and fancurrent != ''">,#{fancurrent}</if>
+			<if test="fanstate != null">,#{fanstate}</if>
+			<if test="vocwpcurrent != null and vocwpcurrent != ''">, #{vocwpcurrent}</if>
+			<if test="vocwpstate != null">, #{vocwpstate}</if>
+			
+			<if test="totalcurrent != null and totalcurrent != ''">, #{totalcurrent}</if>
+			<if test="pointscurrent != null and pointscurrent != ''">, #{pointscurrent}</if>
+			<if test="adsorption != null and adsorption != ''">, #{adsorption}</if>
+			
+			<if test="yfan != null and yfan != ''">, #{yfan}</if>
+			<if test="yfanstate != null">, #{yfanstate}</if>
+			<if test="gfan != null and gfan != ''">, #{gfan}</if>
+			<if test="gfanstate != null">, #{gfanstate}</if>
+			<if test="glwpcurrent != null and glwpcurrent != ''">, #{glwpcurrent}</if>
+			<if test="glwpstate != null">, #{glwpstate}</if>
+			
+			<if test="gleledust != null and gleledust != ''">, #{gleledust}</if>
+			<if test="glfilmdust != null and glfilmdust != ''">, #{glfilmdust}</if>
+			<if test="glbagdust != null and glbagdust != ''">, #{glbagdust}</if>
+		)
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="update" parameterType="WorkingHistoricalMinutesValue">
+		update 
+			tj_hchbdb_working_historicalminutesvalue
+		<set>
+			<if test="equipmentid != null and equipmentid != ''">equipmentid=#{equipmentid}</if>
+			<if test="equipmentname != null and equipmentname != ''">, equipmentname=#{equipmentname}</if>
+			<if test="workingtype != null">, workingtype=#{workingtype}</if>
+			<if test="probeid != null and probeid != ''">, probeid=#{probeid}</if>
+			<if test="historicaltime != null and historicaltime != ''">,historicaltime=#{historicaltime}</if>
+			<if test="fancurrent != null and fancurrent != ''">,fancurrent=#{fancurrent}</if>
+			<if test="fanstate != null">,fanstate=#{fanstate}</if>
+			<if test="vocwpcurrent != null and vocwpcurrent != ''">, vocwpcurrent=#{vocwpcurrent}</if>
+			<if test="vocwpstate != null">, vocwpstate=#{vocwpstate}</if>
+			
+			<if test="totalcurrent != null and totalcurrent != ''">, totalcurrent=#{totalcurrent}</if>
+			<if test="pointscurrent != null and pointscurrent != ''">, pointscurrent=#{pointscurrent}</if>
+			<if test="adsorption != null and adsorption != ''">, adsorption=#{adsorption}</if>
+			
+			<if test="yfan != null and yfan != ''">, yfan=#{yfan}</if>
+			<if test="yfanstate != null">, yfanstate=#{yfanstate}</if>
+			<if test="gfan != null and gfan != ''">, gfan=#{gfan}</if>
+			<if test="gfanstate != null">, gfanstate=#{gfanstate}</if>
+			<if test="glwpcurrent != null and glwpcurrent != ''">, glwpcurrent=#{glwpcurrent}</if>
+			<if test="glwpstate != null">, glwpstate=#{glwpstate}</if>
+			
+			<if test="gleledust != null and gleledust != ''">, gleledust=#{gleledust}</if>
+			<if test="glfilmdust != null and glfilmdust != ''">, glfilmdust=#{glfilmdust}</if>
+			<if test="glbagdust != null and glbagdust != ''">, glbagdust=#{glbagdust}</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<!-- 删除 -->
+	<delete id="delete" parameterType="string">
+		delete from tj_hchbdb_working_historicalminutesvalue where id=#{id}
+	</delete>
+
+	<!-- 根据条件查询，单一的数据 -->
+	<select id="queryDataByCondition" parameterType="WorkingHistoricalMinutesValue" resultMap="WorkingHistoricalMinutesValueMap">
+		select * from tj_hchbdb_working_historicalminutesvalue
+		<where>
+			1=1
+			<if test="id != null and id != ''"> and id=#{id}</if>
+			<if test="equipmentid != null and equipmentid != ''"> and equipmentid=#{equipmentid}</if>
+			<if test="equipmentname != null and equipmentname != ''"> and equipmentname=#{equipmentname}</if>
+			<if test="workingtype != null"> and workingtype=#{workingtype}</if>
+			<if test="probeid != null and probeid != ''"> and probeid=#{probeid}</if>
+			<if test="historicaltime != null and historicaltime != ''"> and historicaltime=#{historicaltime}</if>
+			<if test="fancurrent != null and fancurrent != ''"> and fancurrent=#{fancurrent}</if>
+			<if test="fanstate != null"> and fanstate=#{fanstate}</if>
+			<if test="vocwpcurrent != null and vocwpcurrent != ''"> and vocwpcurrent=#{vocwpcurrent}</if>
+			<if test="vocwpstate != null"> and vocwpstate=#{vocwpstate}</if>
+			<if test="totalcurrent != null and totalcurrent != ''"> and totalcurrent=#{totalcurrent}</if>
+			<if test="pointscurrent != null and pointscurrent != ''"> and pointscurrent=#{pointscurrent}</if>
+			<if test="adsorption != null and adsorption != ''"> and adsorption=#{adsorption}</if>
+			<if test="yfan != null and yfan != ''"> and yfan=#{yfan}</if>
+			<if test="yfanstate != null"> and yfanstate=#{yfanstate}</if>
+			<if test="gfan != null and gfan != ''"> and gfan=#{gfan}</if>
+			<if test="gfanstate != null"> and gfanstate=#{gfanstate}</if>
+			<if test="glwpcurrent != null and glwpcurrent != ''"> and glwpcurrent=#{glwpcurrent}</if>
+			<if test="glwpstate != null"> and glwpstate=#{glwpstate}</if>
+			<if test="gleledust != null and gleledust != ''"> and gleledust=#{gleledust}</if>
+			<if test="glfilmdust != null and glfilmdust != ''"> and glfilmdust=#{glfilmdust}</if>
+			<if test="glbagdust != null and glbagdust != ''"> and glbagdust=#{glbagdust}</if>
+		</where>
+	</select>
+	
+	<!-- 数据总量 -->
+	<select id="queryDataSize" resultType="java.lang.Integer">
+		select count(*) from (
+			select m.id 
+			from tj_hchbdb_working_historicalminutesvalue m 
+			left join tj_hchbdb_equipment e
+				on m.equipmentid = e.eid
+			left join tj_hchbdb_companyInfo_equipment aue 
+				on e.id = aue.equipmentid 
+			left join tj_hchbdb_companyInfo u 
+				on aue.companyid = u.id 
+			<where>
+				1=1 and aue.status=0
+				<if test="name != null and name != ''"> and u.name like '%${name}%'</if>
+				<if test="searchTime != null and searchTime != ''">
+				  and convert(VARCHAR(20), m.historicaltime, 23) <![CDATA[ >= ]]> cast(#{sd} as DATETIME)
+				  and convert(VARCHAR(20), m.historicaltime, 23) <![CDATA[ <= ]]> cast(#{ed} as DATETIME)
+			    </if>
+			</where>
+		) m
+	</select>
+	
+	<!-- 根据条件查询，list数据，分页 -->
+	<select id="queryDataByConditionsPage" resultMap="WorkingHistoricalMinutesValueMap">	
+	select w1.*
+	from (
+		select m.id as id, m.sort as sort, m.equipmentid as equipmentid, m.equipmentname as equipmentname, m.historicaltime as historicaltime, 
+			m.fancurrent as fancurrent,m.fanstate as fanstate,	m.vocwpcurrent as vocwpcurrent, m.vocwpstate as vocwpstate, m.totalcurrent as totalcurrent, 
+			m.pointscurrent as pointscurrent, m.adsorption as adsorption, m.yfan as yfan, m.yfanstate as yfanstate, m.gfan as gfan,
+			m.gfanstate as gfanstate, m.glwpcurrent as glwpcurrent, m.glwpstate as glwpstate, m.gleledust as gleledust, m.glfilmdust as glfilmdust,
+			m.glbagdust as glbagdust, u.id as companyid, u.name as companyname,u.longitude as longitude, u.latitude as latitude
+		from tj_hchbdb_working_historicalminutesvalue m 
+		left join tj_hchbdb_equipment e
+			on m.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment aue 
+			on e.id = aue.equipmentid 
+		left join tj_hchbdb_companyInfo u 
+			on aue.companyid = u.id 
+		<where>
+			1=1 and aue.status=0
+			<if test="companyInfo.name != null and companyInfo.name != ''"> and u.name like '%${companyInfo.name}%'</if>
+		</where>
+	) w1 left join (
+		select m.id
+		from ( 
+			select *
+			from tj_hchbdb_working_historicalminutesvalue 
+			where
+				1=1
+				<if test="companyInfo.eid != null and companyInfo.eid != ''">  and equipmentid = #{companyInfo.eid} </if>
+				<if test="companyInfo.searchTime != null and companyInfo.searchTime != ''">
+					and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ >= ]]> cast(#{companyInfo.sd} as DATETIME)
+					and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ <= ]]> cast(#{companyInfo.ed} as DATETIME)
+				</if>
+			)m 
+		) w2 
+	on w1.id = w2.id
+	where 1=1
+	</select>
+	
+	<select id="queryLastDataWork" parameterType="TjHchbdbCompanyInfo" resultType="WorkingHistoricalMinutesValue">
+		select emec.cname as companyname, w.* from 
+		(select * from 
+			(select  equipmentid,historicaltime from tj_hchbdb_working_historicalminutesvalue 
+				where historicaltime = (select top 1 historicaltime from tj_hchbdb_working_historicalminutesvalue order by historicaltime desc)
+				group by equipmentid, historicaltime
+			) em
+			left join
+			(select e.eid as eid,c.name as cname from tj_hchbdb_equipment e
+				left join tj_hchbdb_companyInfo_equipment ce on e.id = ce.equipmentid
+				left join tj_hchbdb_companyInfo c on c.id = ce.companyid
+				where ce.status = 0
+			) ec on ec.eid = em.equipmentid 
+			<if test="name != null and name != ''">
+				where ec.cname like '%${name}%'
+			</if>
+		) emec
+		left join tj_hchbdb_working_historicalminutesvalue w 
+			on emec.equipmentid = w.equipmentid and emec.historicaltime = w.historicaltime
+		where  emec.cname is not null
+		order by emec.cname desc
+	</select>
+	
+	<select id="queryWorkComapny" parameterType="TjHchbdbCompanyInfo" resultMap="CompanyInfoMap2">
+		select c.id,c.name,e.eid,c.isAvailable
+		from tj_hchbdb_companyInfo c
+		left join tj_hchbdb_companyInfo_equipment ce
+			on c.id = ce.companyid
+		left join tj_hchbdb_equipment e
+			on ce.equipmentid = e.id
+		<where>
+			ce.status = 0
+			<if test="stype == 1"> and e.eid like '%V'</if>
+			<if test="stype == 2"> and e.eid like '%G'</if>
+			<if test="stype == 3"> and e.eid like '%Y'</if>
+			<if test="id != null and id != ''"> and c.id = #{id} </if>
+			<if test="name != null and name != ''"> and c.name like '%${name}%'</if>
+		</where>
+	</select>
+	
+	<select id="queryLastDataByEquipmentid" parameterType="java.lang.String" resultType="WorkingHistoricalMinutesValue">		
+		select w1.*, c.name as companyname, c.id as companyid
+		from tj_hchbdb_working_historicalminutesvalue w1
+		left join tj_hchbdb_equipment e 
+			on w1.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment ce 
+			on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c 
+			on ce.companyid = c.id
+		where 
+			w1.equipmentid = #{equipmentid} and c.name is not null
+			and w1.historicaltime = (select top 1 historicaltime 
+									from tj_hchbdb_working_historicalminutesvalue 
+									where equipmentid = #{equipmentid}
+									order by historicaltime desc)
+	</select>
+	
+	<select id="queryBaoBiao" resultType="WorkingHistoricalHoursValue">	
+		select w.*,c.name as companyname
+		from tj_hchbdb_working_historicalminutesvalue w 
+		left join tj_hchbdb_equipment e 
+			on w.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment ce 
+			on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c 
+			on ce.companyid = c.id
+		where 
+			w.equipmentid = #{equipmentid} and c.name is not null
+			and convert(VARCHAR(100), w.historicaltime, 25) <![CDATA[ >= ]]> cast(#{sd} as DATETIME)
+			and convert(VARCHAR(100), w.historicaltime, 25) <![CDATA[ < ]]> cast(#{ed} as DATETIME)
+		order by w.historicaltime desc
+	</select>
+	
+	<!-- 查询一级数据 -->
+	<select id="queryDataFirst" parameterType="java.lang.String" resultMap="WorkingHistoricalMinutesValueMap1">	
+		select top 1 *
+		from tj_hchbdb_working_historicalminutesvalue
+		<where>
+			datediff(day, historicaltime, getdate()) = 0
+			and equipmentid = #{equipmentid}
+		</where>
+		order by historicaltime desc
+	</select>
+	<!-- 查询二级数据 -->
+	<select id="queryDataSecond" parameterType="java.lang.String" resultMap="WorkingHistoricalMinutesValueMap2">	
+		select m.id as id, m.sort as sort, m.equipmentid as equipmentid, m.probeid as probeid, m.totalcurrent as totalcurrent, 
+			m.pointscurrent as pointscurrent, m.adsorption as adsorption,  m.gleledust as gleledust, m.glfilmdust as glfilmdust,
+			m.glbagdust as glbagdust
+		from tj_hchbdb_working_historicalminutesvalue m  
+		<where>
+			1=1<if test="_parameter != null and _parameter != ''"> and m.equipmentid=#{equipmentid}</if>
+		</where>
+	</select>
+	<!-- 查询三级数据 -->
+	<select id="queryDataThird" parameterType="java.lang.String" resultMap="WorkingHistoricalMinutesValueMap3">	
+		select m.id as id, m.sort as sort, m.equipmentid as equipmentid, m.equipmentname as equipmentname, m.probeid as probeid,
+			m.fancurrent as fancurrent,m.fanstate as fanstate,	m.vocwpcurrent as vocwpcurrent, m.vocwpstate as vocwpstate, m.yfan as yfan, 
+			m.yfanstate as yfanstate, m.gfan as gfan,m.gfanstate as gfanstate, m.glwpcurrent as glwpcurrent, m.glwpstate as glwpstate
+		from tj_hchbdb_working_historicalminutesvalue m  
+		<where>
+			1=1
+			<if test="_parameter != null and _parameter != ''"> and m.equipmentid=#{_parameter}</if>
+		</where>
+	</select>
+</mapper>

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hchbht.mapper.ContrastMapper">
+	<!-- 环比 VOC 数据  分钟-->
+	<select id="contrastDataVOCMinutes" parameterType="TjHchbdbCompanyInfo" resultType="AirHistoricalMinutesVOC">
+	select emec.companyid,emec.cname as companyname,emec.longitude, emec.latitude, w.* 
+	from (select * 
+			from (select  equipmentid,historicaltime 
+				from tj_hchbdb_air_historicalminutesvoc      
+				where historicaltime in (<choose>
+									        <when test="searchTime !=null and searchTime != ''">
+									            #{sd}, #{ed}
+									        </when>
+									        <otherwise>
+									            select top 2 m.*
+												from (select distinct historicaltime 
+													from tj_hchbdb_air_historicalminutesvoc) m
+												order by m.historicaltime desc
+									        </otherwise>
+									    </choose>)
+				group by equipmentid, historicaltime    ) em    
+			left join    (select e.eid as eid,c.name as cname, c.id as companyid, 
+									c.longitude as longitude, c.latitude as latitude
+							from tj_hchbdb_equipment e     
+							left join tj_hchbdb_companyInfo_equipment ce on e.id = ce.equipmentid     
+							left join tj_hchbdb_companyInfo c on c.id = ce.companyid ) ec 
+			on ec.eid = em.equipmentid 
+			<if test="name != null and name != ''">
+				where ec.cname like '%${name}%'
+			</if> 
+			) emec   
+	left join  tj_hchbdb_air_historicalminutesvoc  w 
+		on emec.equipmentid = w.equipmentid and emec.historicaltime = w.historicaltime  
+	where emec.cname is not null
+	order by emec.cname,emec.historicaltime desc
+	</select>
+	
+	<!-- 环比 VOC 数据   小时以上的 -->
+	<select id="contrastDataVOC" parameterType="TjHchbdbCompanyInfo" resultType="AirHistoricalHoursVOC">
+	select emec.companyid,emec.cname as companyname,emec.longitude, emec.latitude, w.* 
+	from (select * 
+			from (select  equipmentid,historicaltime 
+				from tj_hchbdb_air_historicalhoursvoc      
+				where historicaltime in (<choose>
+									        <when test="searchTime !=null and searchTime != ''">
+									            #{sd}, #{ed}
+									        </when>
+									        <otherwise>
+									            select top 2 m.*
+												from (select distinct historicaltime 
+													from tj_hchbdb_air_historicalhoursvoc) m
+												order by m.historicaltime desc
+									        </otherwise>
+									    </choose>)
+				group by equipmentid, historicaltime    ) em    
+			left join    (select e.eid as eid,c.name as cname, c.id as companyid, 
+									c.longitude as longitude, c.latitude as latitude
+							from tj_hchbdb_equipment e     
+							left join tj_hchbdb_companyInfo_equipment ce on e.id = ce.equipmentid     
+							left join tj_hchbdb_companyInfo c on c.id = ce.companyid ) ec 
+			on ec.eid = em.equipmentid
+			<if test="name != null and name != ''">
+				where ec.cname like '%${name}%'
+			</if> 
+			) emec   
+	left join  tj_hchbdb_air_historicalhoursvoc  w 
+		on emec.equipmentid = w.equipmentid and emec.historicaltime = w.historicaltime  
+	where emec.cname is not null
+	order by emec.cname,emec.historicaltime desc
+	</select>
+	
+	<!-- 环比工况 数据  分钟-->
+	<select id="contrastWorkMinutes" parameterType="TjHchbdbCompanyInfo" resultType="WorkingHistoricalMinutesValue">
+	select emec.companyid,emec.cname as companyname,emec.longitude, emec.latitude, w.*
+	from (select em.*,ec.* from 
+		(select  equipmentid,historicaltime 
+		from tj_hchbdb_working_historicalminutesvalue 
+		where historicaltime in (<choose>
+							        <when test="searchTime !=null and searchTime != ''">
+							            #{sd}, #{ed}
+							        </when>
+							        <otherwise>
+							            select top 2 m.* 
+										from (select distinct historicaltime 
+											from tj_hchbdb_working_historicalminutesvalue )m
+										order by m.historicaltime desc
+							        </otherwise>
+							    </choose>)
+			group by equipmentid, historicaltime
+		) em
+		left join
+		(select e.eid as eid,c.name as cname, c.id as companyid, 
+				c.longitude as longitude, c.latitude as latitude  
+		from tj_hchbdb_equipment e
+		left join tj_hchbdb_companyInfo_equipment ce on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c on c.id = ce.companyid
+		) ec on ec.eid = em.equipmentid 
+	) emec
+	left join tj_hchbdb_working_historicalminutesvalue w 
+	on emec.equipmentid = w.equipmentid and emec.historicaltime = w.historicaltime
+	where emec.cname is not null
+	order by emec.cname, emec.historicaltime desc
+	</select>
+	
+	<!-- 环比 工况 数据   小时以上的 -->
+	<select id="contrastWork" parameterType="TjHchbdbCompanyInfo" resultType="WorkingHistoricalHoursValue">
+	select emec.companyid,emec.cname as companyname,emec.longitude, emec.latitude, w.*
+	from (select em.*,ec.* from 
+		(select  equipmentid,historicaltime 
+		from tj_hchbdb_working_historicalhoursvalue 
+		where historicaltime in (<choose>
+							        <when test="searchTime !=null and searchTime != ''">
+							            #{sd}, #{ed}
+							        </when>
+							        <otherwise>
+							            select top 2 m.* 
+										from (select distinct historicaltime 
+											from tj_hchbdb_working_historicalhoursvalue )m
+										order by m.historicaltime desc
+							        </otherwise>
+							    </choose>)
+			group by equipmentid, historicaltime
+		) em
+		left join
+		(select e.eid as eid,c.name as cname, c.id as companyid, 
+				c.longitude as longitude, c.latitude as latitude  
+		from tj_hchbdb_equipment e
+		left join tj_hchbdb_companyInfo_equipment ce on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c on c.id = ce.companyid
+		) ec on ec.eid = em.equipmentid 
+	) emec
+	left join tj_hchbdb_working_historicalhoursvalue w 
+	on emec.equipmentid = w.equipmentid and emec.historicaltime = w.historicaltime
+	where emec.cname is not null
+	order by emec.cname, emec.historicaltime desc
+	</select>
+	
+	<!-- 环比 油烟 数据  分钟-->
+	<select id="contrastLampMinutes" parameterType="TjHchbdbCompanyInfo" resultType="LampblackHistoricalMinutesValue">
+	select emec.companyid,emec.cname as companyname,emec.longitude, emec.latitude, w.*
+	from (select * 
+			from (select  equipmentid,historicaltime 
+				from tj_hchbdb_lampblack_historicalminutesvalue      
+				where historicaltime in (<choose>
+									        <when test="searchTime !=null and searchTime != ''">
+									            #{sd}, #{ed}
+									        </when>
+									        <otherwise>
+									            select top 2 m.*
+												from (select distinct historicaltime 
+													from tj_hchbdb_lampblack_historicalminutesvalue) m
+												order by m.historicaltime desc
+									        </otherwise>
+									    </choose>)     
+				group by equipmentid, historicaltime    ) em    
+			left join    (select e.eid as eid,c.name as cname, c.id as companyid, 
+								c.longitude as longitude, c.latitude as latitude 
+							from tj_hchbdb_equipment e     
+							left join tj_hchbdb_companyInfo_equipment ce on e.id = ce.equipmentid     
+							left join tj_hchbdb_companyInfo c on c.id = ce.companyid    ) ec 
+			on ec.eid = em.equipmentid 
+			<if test="name != null and name != ''">
+				where ec.cname like '%${name}%'
+			</if>        
+			) emec   
+	left join  tj_hchbdb_lampblack_historicalminutesvalue  w 
+		on emec.equipmentid = w.equipmentid and emec.historicaltime = w.historicaltime
+	where emec.cname is not null   
+	order by emec.cname,emec.historicaltime desc
+	</select>
+	
+	<!-- 环比 油烟 数据   小时以上的 -->
+	<select id="contrastLamp" parameterType="TjHchbdbCompanyInfo" resultType="LampblackHistoricalHoursValue">
+	select emec.companyid,emec.cname as companyname,emec.longitude, emec.latitude, w.*
+	from (select * 
+			from (select  equipmentid,historicaltime 
+				from tj_hchbdb_lampblack_historicalhoursvalue      
+				where historicaltime in (<choose>
+									        <when test="searchTime !=null and searchTime != ''">
+									            #{sd}, #{ed}
+									        </when>
+									        <otherwise>
+									            select top 2 m.*
+												from (select distinct historicaltime 
+													from tj_hchbdb_lampblack_historicalhoursvalue) m
+												order by m.historicaltime desc
+									        </otherwise>
+									    </choose>)     
+				group by equipmentid, historicaltime    ) em    
+			left join    (select e.eid as eid,c.name as cname, c.id as companyid, 
+								c.longitude as longitude, c.latitude as latitude 
+							from tj_hchbdb_equipment e     
+							left join tj_hchbdb_companyInfo_equipment ce on e.id = ce.equipmentid     
+							left join tj_hchbdb_companyInfo c on c.id = ce.companyid    ) ec 
+			on ec.eid = em.equipmentid 
+			<if test="name != null and name != ''">
+				where ec.cname like '%${name}%'
+			</if>        
+			) emec   
+	left join  tj_hchbdb_lampblack_historicalhoursvalue  w 
+		on emec.equipmentid = w.equipmentid and emec.historicaltime = w.historicaltime  
+	where emec.cname is not null 
+	order by emec.cname,emec.historicaltime desc
+	</select>
+</mapper>

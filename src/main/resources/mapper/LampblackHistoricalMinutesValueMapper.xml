@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hchbht.mapper.LampblackHistoricalMinutesValueMapper">
+
+	<resultMap type="LampblackHistoricalMinutesValue" id="LampblackHistoricalMinutesValueMap">
+		<id column="id" property="id" />
+		<result column="sort" property="sort" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="probeid" property="probeid" />
+		<result column="historicaltime" property="historicaltime" />
+		<result column="concentration" property="concentration" />
+		<result column="fanstate" property="fanstate" />
+		<result column="purifierstate" property="purifierstate" />
+		<result column="purifiercurrent" property="purifiercurrent" />
+		<result column="temperature" property="temperature" />
+		
+		<result column="companyid" property="companyid" />
+		<result column="companyname" property="companyname" />
+		<result column="longitude" property="longitude" />
+		<result column="latitude" property="latitude" />
+	</resultMap>
+	
+	<resultMap type="TjHchbdbCompanyInfo" id="CompanyInfoMap2">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="eid" property="eid" />
+		<result column="isAvailable" property="isAvailable" />
+		
+		<collection property="mlamp" javaType="ArrayList" column="eid" ofType="LampblackHistoricalMinutesValue" select="queryLastDataByEquipmentid"/>
+	</resultMap>
+	
+	<!-- 添加 -->
+	<insert id="insert" parameterType="LampblackHistoricalMinutesValue">
+		insert into tj_hchbdb_lampblack_historicalminutesvalue(
+			<if test="id != null and id != ''">id</if>
+			<if test="equipmentid != null and equipmentid != ''">, equipmentid</if>
+			<if test="probeid != null and probeid != ''">, probeid</if>
+			<if test="historicaltime != null and historicaltime != ''">, historicaltime</if>
+			<if test="concentration != null and concentration != ''">, concentration</if>
+			<if test="fanstate != null">, fanstate</if>
+			<if test="purifierstate != null">, purifierstate</if>
+			<if test="purifiercurrent != null and purifiercurrent != ''">, purifiercurrent</if>
+			<if test="temperature != null and temperature != ''">, temperature</if>
+		)values(
+			<if test="id != null and id != ''">#{id}</if>
+			<if test="equipmentid != null and equipmentid != ''">,#{equipmentid}</if>
+			<if test="probeid != null and probeid != ''">,#{probeid}</if>
+			<if test="historicaltime != null and historicaltime != ''">,#{historicaltime}</if>
+			<if test="concentration != null and concentration != ''">,#{concentration}</if>
+			<if test="fanstate != null">,#{fanstate}</if>
+			<if test="purifierstate != null">,#{purifierstate}</if>
+			<if test="purifiercurrent != null and purifiercurrent != ''">,#{purifiercurrent}</if>
+			<if test="temperature != null and temperature != ''">,#{temperature}</if>
+		)
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="update" parameterType="LampblackHistoricalMinutesValue">
+		update 
+			tj_hchbdb_lampblack_historicalminutesvalue
+		<set>
+			<if test="equipmentid != null and equipmentid != ''">equipmentid=#{equipmentid}</if>
+			<if test="probeid != null and probeid != ''">, probeid=#{probeid}</if>
+			<if test="historicaltime != null and historicaltime != ''">,historicaltime=#{historicaltime}</if>
+			<if test="concentration != null and concentration != ''">,concentration=#{concentration}</if>
+			<if test="fanstate != null">,fanstate=#{fanstate}</if>
+			<if test="purifierstate != null">,purifierstate=#{purifierstate}</if>
+			<if test="purifiercurrent != null and purifiercurrent != ''">,purifiercurrent=#{purifiercurrent}</if>
+			<if test="temperature != null and temperature != ''">,temperature=#{temperature}</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<!-- 删除 -->
+	<delete id="delete" parameterType="string">
+		delete from tj_hchbdb_lampblack_historicalminutesvalue where id=#{id}
+	</delete>
+
+	<!-- 根据条件查询，单一的数据 -->
+	<select id="queryDataByCondition" parameterType="LampblackHistoricalMinutesValue" resultMap="LampblackHistoricalMinutesValueMap">
+		select * from tj_hchbdb_lampblack_historicalminutesvalue
+		<where>
+			1=1
+			<if test="id != null and id != ''"> and id=#{id}</if>
+			<if test="equipmentid != null and equipmentid != ''"> and equipmentid=#{equipmentid}</if>
+			<if test="probeid != null and probeid != ''"> and probeid=#{probeid}</if>
+			<if test="historicaltime != null and historicaltime != ''"> and historicaltime=#{historicaltime}</if>
+			<if test="concentration != null and concentration != ''"> and concentration=#{concentration}</if>
+			<if test="fanstate != null"> and fanstate=#{fanstate}</if>
+			<if test="purifierstate != null"> and purifierstate=#{purifierstate}</if>
+			<if test="purifiercurrent != null and purifiercurrent != ''"> and purifiercurrent=#{purifiercurrent}</if>
+			<if test="temperature != null and temperature != ''"> and temperature=#{temperature}</if>
+		</where>
+	</select>
+	
+	<!-- 数据总量 -->
+	<select id="queryDataSize" resultType="java.lang.Integer">
+		select count(*) from (
+			select m.id 
+			from tj_hchbdb_lampblack_historicalminutesvalue m 
+			left join tj_hchbdb_equipment e
+				on m.equipmentid = e.eid
+			left join tj_hchbdb_companyInfo_equipment aue 
+				on e.id = aue.equipmentid 
+			left join tj_hchbdb_companyInfo u 
+				on aue.companyid = u.id 
+			<where>
+				1=1 and aue.status=0
+				<if test="name != null and name != ''"> and u.name like '%${name}%'</if>
+				<if test="searchTime != null and searchTime != ''">
+					and convert(VARCHAR(20), m.historicaltime, 23) <![CDATA[ >= ]]> cast(#{sd} as DATETIME)
+					and convert(VARCHAR(20), m.historicaltime, 23) <![CDATA[ <= ]]> cast(#{ed} as DATETIME)
+				</if>
+			</where>
+		) m
+	</select>
+	
+	<!-- 根据条件查询，list数据，分页 -->
+	<select id="queryDataByConditionsPage" resultMap="LampblackHistoricalMinutesValueMap">	
+	select w1.*
+	from (
+		select m.id as id, m.sort as sort, m.equipmentid as equipmentid, m.historicaltime as historicaltime, m.concentration as concentration, 
+			m.fanstate as fanstate, m.purifierstate as purifierstate, m.purifiercurrent as purifiercurrent, m.temperature as temperature,
+			u.id as companyid, u.name as companyname,u.longitude as longitude, u.latitude as latitude
+		from tj_hchbdb_lampblack_historicalminutesvalue m 
+		left join tj_hchbdb_equipment e
+			on m.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment aue 
+			on e.id = aue.equipmentid 
+		left join tj_hchbdb_companyInfo u 
+			on aue.companyid = u.id 
+		<where>
+			1=1 and aue.status=0
+			<if test="companyInfo.name != null and companyInfo.name != ''"> and u.name like '%${companyInfo.name}%'</if>
+		</where>
+	) w1 left join (
+		select m.id
+		from ( 
+			select *
+			from tj_hchbdb_lampblack_historicalminutesvalue 
+			where
+				1=1
+				<if test="companyInfo.eid != null and companyInfo.eid != ''">  and equipmentid = #{companyInfo.eid} </if>
+				<if test="companyInfo.searchTime != null and companyInfo.searchTime != ''">
+					and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ >= ]]> cast(#{companyInfo.sd} as DATETIME)
+					and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ <= ]]> cast(#{companyInfo.ed} as DATETIME)
+				</if>
+			)m 
+		) w2 
+	on w1.id = w2.id
+	where 1=1
+	</select>
+	
+	<select id="queryLastDataLamp" parameterType="TjHchbdbCompanyInfo" resultType="LampblackHistoricalMinutesValue">
+		select emec.cname as companyname, w.* 
+		from (select * 
+				from (select  equipmentid,historicaltime 
+					from tj_hchbdb_lampblack_historicalminutesvalue      
+					where historicaltime = (select top 1 historicaltime 
+											from tj_hchbdb_lampblack_historicalminutesvalue order by historicaltime desc)     
+					group by equipmentid, historicaltime    ) em    
+				left join    (select e.eid as eid,c.name as cname 
+								from tj_hchbdb_equipment e     
+								left join tj_hchbdb_companyInfo_equipment ce on e.id = ce.equipmentid     
+								left join tj_hchbdb_companyInfo c on c.id = ce.companyid
+								where ce.status=0    ) ec 
+				on ec.eid = em.equipmentid 
+				<if test="name != null and name != ''">
+					where ec.cname like '%${name}%'
+				</if>        
+				) emec   
+		left join  tj_hchbdb_lampblack_historicalminutesvalue  w 
+			on emec.equipmentid = w.equipmentid and emec.historicaltime = w.historicaltime  
+		where  emec.cname is not null 
+		order by emec.cname desc
+	</select>
+	
+	<select id="queryWorkComapny" parameterType="TjHchbdbCompanyInfo" resultMap="CompanyInfoMap2">
+		select c.id,c.name,e.eid,c.isAvailable
+		from tj_hchbdb_companyInfo c
+		left join tj_hchbdb_companyInfo_equipment ce
+			on c.id = ce.companyid
+		left join tj_hchbdb_equipment e
+			on ce.equipmentid = e.id
+		<where>
+			ce.status = 0
+			<if test="stype == 1"> and e.eid like '%V'</if>
+			<if test="stype == 2"> and e.eid like '%G'</if>
+			<if test="stype == 3"> and e.eid like '%Y'</if>
+			<if test="id != null and id != ''"> and c.id = #{id} </if>
+			<if test="name != null and name != ''"> and c.name like '%${name}%'</if>
+		</where>
+	</select>
+	
+	<select id="queryLastDataByEquipmentid" parameterType="java.lang.String" resultType="LampblackHistoricalMinutesValue">		
+		select w.*,c.name as companyname, c.id as companyid
+		from tj_hchbdb_lampblack_historicalminutesvalue w 
+		left join tj_hchbdb_equipment e 
+			on w.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment ce 
+			on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c 
+			on ce.companyid = c.id
+		where 
+			w.equipmentid = #{equipmentid} and c.name is not null
+			and w.historicaltime = (select top 1 historicaltime 
+									from tj_hchbdb_lampblack_historicalminutesvalue 
+									where equipmentid = #{equipmentid}
+									order by historicaltime desc)
+	</select>
+	
+	<select id="queryBaoBiao" resultType="LampblackHistoricalMinutesValue">
+		select w.*,c.name as companyname, c.id as companyid
+		from tj_hchbdb_lampblack_historicalminutesvalue w 
+		left join tj_hchbdb_equipment e 
+			on w.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment ce 
+			on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c 
+			on ce.companyid = c.id
+		where 
+			w.equipmentid = #{equipmentid} and c.name is not null
+			and convert(VARCHAR(100), w.historicaltime, 25) <![CDATA[ >= ]]> cast(#{sd} as DATETIME)
+			and convert(VARCHAR(100), w.historicaltime, 25) <![CDATA[ < ]]> cast(#{ed} as DATETIME)
+		order by w.historicaltime desc
+	</select>
+</mapper>

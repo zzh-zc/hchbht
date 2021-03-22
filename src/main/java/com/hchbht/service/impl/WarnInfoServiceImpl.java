@@ -94,7 +94,9 @@ public class WarnInfoServiceImpl implements WarnInfoService {
 	 */
 	public Object queryDataByConditionsPage(Integer curPage,Integer pageSize, WarnInfo warnInfo) {
 		System.out.println("chooseId : " + warnInfo.getChooseId());
-		PageHelper.startPage(curPage,pageSize);
+		if (curPage!= null && pageSize != null) {
+			PageHelper.startPage(curPage, pageSize);
+		}
 		//字段乱码处理
 		//companyInfo = (CompanyInfo) CodeConversionUtils.ObjectConversion(companyInfo, "utf-8");
 		List<WarnInfo> list = warnInfoMapper.queryDataByConditionsPage(warnInfo);

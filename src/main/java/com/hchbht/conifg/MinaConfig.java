@@ -17,30 +17,26 @@ import java.nio.charset.Charset;
 /**
  * Created by zzh on 2021/03/17
  */
-@Configuration
+//@Configuration
 public class MinaConfig {
-    @Bean
-    public LoggingFilter loggingFilter() {
-        return new LoggingFilter();
-    }
-    @Bean
-    public IoHandler ioHandler() {
-        return new TimeServerHandler();
-    }
 //    @Bean
-//    public InetSocketAddress inetSocketAddress() {
-//        return new InetSocketAddress(PORT);
+//    public LoggingFilter loggingFilter() {
+//        return new LoggingFilter();
 //    }
-
-    @Bean
-    public IoAcceptor ioAcceptor() throws Exception {
-        IoAcceptor acceptor=new NioSocketAcceptor();
-        acceptor.getFilterChain().addLast( "logger", loggingFilter() );
-        acceptor.getFilterChain().addLast( "codec", new ProtocolCodecFilter( new TextLineCodecFactory(Charset.forName("UTF-8"))));
-        acceptor.setHandler(ioHandler());
-        acceptor.getSessionConfig().setReadBufferSize( 2048 );
-        acceptor.getSessionConfig().setIdleTime( IdleStatus.BOTH_IDLE, 10 );
-        acceptor.bind();
-        return acceptor;
-    }
+//    @Bean
+//    public IoHandler ioHandler() {
+//        return new TimeServerHandler();
+//    }
+//
+//    @Bean
+//    public IoAcceptor ioAcceptor() throws Exception {
+//        IoAcceptor acceptor=new NioSocketAcceptor();
+//        acceptor.getFilterChain().addLast( "logger", loggingFilter() );
+//        acceptor.getFilterChain().addLast( "codec", new ProtocolCodecFilter( new TextLineCodecFactory(Charset.forName("UTF-8"))));
+//        acceptor.setHandler(ioHandler());
+//        acceptor.getSessionConfig().setReadBufferSize( 2048 );
+//        acceptor.getSessionConfig().setIdleTime( IdleStatus.BOTH_IDLE, 10 );
+//        acceptor.bind();
+//        return acceptor;
+//    }
 }

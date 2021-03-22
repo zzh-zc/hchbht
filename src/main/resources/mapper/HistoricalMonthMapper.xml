@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hchbht.mapper.HistoricalMonthMapper">
+
+	<resultMap type="AirHistoricalHoursVOC" id="AirHistoricalHoursVOCMap">
+		<id column="id" property="id" />
+		<result column="sort" property="sort" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="historicaltime" property="historicaltime" />
+		
+		<result column="hydrocarbon" property="hydrocarbon" />
+		<result column="rate" property="rate" />
+		<result column="temperature" property="temperature" />
+		<result column="pressure" property="pressure" />
+		<result column="humidity" property="humidity" />
+		<result column="wastegas" property="wastegas" />
+		<result column="speed" property="speed" />
+		
+		<result column="companyid" property="companyid" />
+		<result column="companyname" property="companyname" />
+		<result column="btime" property="btime" />
+	</resultMap>	
+	<resultMap type="TjHchbdbCompanyInfo" id="CompanyInfoMap1">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="eid" property="eid" />
+		<result column="isAvailable" property="isAvailable" />
+		<collection property="hvoc" javaType="ArrayList" column="eid" ofType="AirHistoricalHoursVOC" select="queryLastDataByEquipmentidVoc"/>
+	</resultMap>
+	
+	<resultMap type="WorkingHistoricalHoursValue" id="WorkingHistoricalHoursValueMap">
+		<id column="id" property="id" />
+		<result column="sort" property="sort" />
+		<result column="workingtype" property="workingtype" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="equipmentname" property="equipmentname" />
+		<result column="probeid" property="probeid" />
+		<result column="historicaltime" property="historicaltime" />
+		<!-- TVOC字段 -->
+		<result column="fancurrent" property="fancurrent" />
+		<result column="vocwpcurrent" property="vocwpcurrent" />
+		<!-- TVOC 、 锅炉公用字段 -->
+		<result column="totalcurrent" property="totalcurrent" />
+		<result column="pointscurrent" property="pointscurrent" />
+		<result column="adsorption" property="adsorption" />
+		<!-- 锅炉字段 -->
+		<result column="yfan" property="yfan" />
+		<result column="gfan" property="gfan" />
+		<result column="glwpcurrent" property="glwpcurrent" />
+		<result column="gleledust" property="gleledust" />
+		<result column="glfilmdust" property="glfilmdust" />
+		<result column="glbagdust" property="glbagdust" />
+		
+		<!-- 非数据库字段 -->
+		<result column="companyid" property="companyid" />
+		<result column="companyname" property="companyname" />
+		<result column="btime" property="btime" />
+	</resultMap>
+	<resultMap type="TjHchbdbCompanyInfo" id="CompanyInfoMap2">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="eid" property="eid" />
+		<result column="isAvailable" property="isAvailable" />
+		
+		<collection property="hwork" javaType="ArrayList" column="eid" ofType="WorkingHistoricalHoursValue" select="queryLastDataByEquipmentidWork"/>
+	</resultMap>
+	
+	<resultMap type="LampblackHistoricalHoursValue" id="LampblackHistoricalHoursValueMap">
+		<id column="id" property="id" />
+		<result column="sort" property="sort" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="historicaltime" property="historicaltime" />
+		<result column="concentration" property="concentration" />
+		<result column="purifiercurrent" property="purifiercurrent" />
+		<result column="temperature" property="temperature" />
+		
+		<result column="companyid" property="companyid" />
+		<result column="companyname" property="companyname" />
+		<result column="btime" property="btime" />
+	</resultMap>
+	<resultMap type="TjHchbdbCompanyInfo" id="CompanyInfoMap3">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="eid" property="eid" />
+		<result column="isAvailable" property="isAvailable" />
+		
+		<collection property="hlamp" javaType="ArrayList" column="eid" ofType="LampblackHistoricalHoursValue" select="queryLastDataByEquipmentidLamp"/>
+	</resultMap>
+	
+	<select id="queryComapnyVoc" parameterType="TjHchbdbCompanyInfo" resultMap="CompanyInfoMap1">
+		select c.id,c.name,e.eid,c.isAvailable
+		from tj_hchbdb_companyInfo c
+		left join tj_hchbdb_companyInfo_equipment ce
+			on c.id = ce.companyid
+		left join tj_hchbdb_equipment e
+			on ce.equipmentid = e.id
+		<where>
+			ce.status = 0
+			<if test="stype == 1"> and e.eid like '%V'</if>
+			<if test="stype == 2"> and e.eid like '%G'</if>
+			<if test="stype == 3"> and e.eid like '%Y'</if>
+			<if test="id != null and id != ''"> and c.id = #{id} </if>
+			<if test="name != null and name != ''"> and c.name like '%${name}%'</if>
+		</where>
+	</select>
+	<select id="queryLastDataByEquipmentidVoc" parameterType="java.lang.String" resultType="AirHistoricalHoursVOC">	
+		select w.*, c.id as companyid, c.name as companyname
+		from (
+			select id, equipmentid, 
+				year(historicaltime) years, month(historicaltime) months,
+				cast(year(historicaltime) as varchar)+'-'+cast(month(historicaltime) as varchar) btime, 
+				cast(cast(avg(cast(hydrocarbon as numeric(10,3))) as numeric(10,3)) as varchar) hydrocarbon, 
+				cast(cast(avg(cast(rate as numeric(10,3))) as numeric(10,3)) as varchar) rate, 
+				cast(cast(avg(cast(temperature as numeric(10,3))) as numeric(10,3)) as varchar) temperature, 
+				cast(cast(avg(cast(pressure as numeric(10,3))) as numeric(10,3)) as varchar) pressure, 
+				cast(cast(avg(cast(humidity as numeric(10,3))) as numeric(10,3)) as varchar) humidity, 
+				cast(cast(avg(cast(wastegas as numeric(10,3))) as numeric(10,3)) as varchar) wastegas,
+				cast(cast(avg(cast(speed as numeric(10,3))) as numeric(10,3)) as varchar) speed
+			from  tj_hchbdb_air_historicalhoursvoc
+			where equipmentid = #{equipmentid}
+				and historicaltime = (select top 1 historicaltime 
+									from tj_hchbdb_air_historicalhoursvoc 
+									where equipmentid = #{equipmentid}
+									order by historicaltime desc)
+			group by year(historicaltime), month(historicaltime), id, equipmentid
+		) w 
+		left join tj_hchbdb_equipment e 
+			on w.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment ce 
+			on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c 
+			on ce.companyid = c.id
+		where c.name is not null
+	</select>
+	<select id="queryDataByConditionsPageVoc" resultMap="AirHistoricalHoursVOCMap">	
+	select m.*
+	from (
+		select w.*, c.name as companyname
+		from (
+			select equipmentid,
+				year(historicaltime) years, month(historicaltime) months,
+				cast(year(historicaltime) as varchar)+'-'+cast(month(historicaltime) as varchar) btime, 
+				cast(cast(avg(cast(hydrocarbon as numeric(10,3))) as numeric(10,3)) as varchar) hydrocarbon, 
+				cast(cast(avg(cast(rate as numeric(10,3))) as numeric(10,3)) as varchar) rate, 
+				cast(cast(avg(cast(temperature as numeric(10,3))) as numeric(10,3)) as varchar) temperature, 
+				cast(cast(avg(cast(pressure as numeric(10,3))) as numeric(10,3)) as varchar) pressure, 
+				cast(cast(avg(cast(humidity as numeric(10,3))) as numeric(10,3)) as varchar) humidity, 
+				cast(cast(avg(cast(wastegas as numeric(10,3))) as numeric(10,3)) as varchar) wastegas,
+				cast(cast(avg(cast(speed as numeric(10,3))) as numeric(10,3)) as varchar) speed
+			from tj_hchbdb_air_historicalhoursvoc
+			<where>
+				<if test="companyInfo.eid != null and companyInfo.eid != ''">  and equipmentid = #{companyInfo.eid} </if>
+				<if test="companyInfo.searchTime != null and companyInfo.searchTime != ''">
+					and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ >= ]]> cast(#{companyInfo.sd} as DATETIME)
+					and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ <= ]]> cast(#{companyInfo.ed} as DATETIME)
+				</if>
+			</where> 
+			group by year(historicaltime), month(historicaltime), equipmentid
+		) w 
+		left join tj_hchbdb_equipment e 
+			on w.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment ce 
+			on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c 
+			on ce.companyid = c.id
+		<where> 
+			c.name is not null
+			<if test="companyInfo.name != null and companyInfo.name != ''"> and c.name like '%${companyInfo.name}%'</if>
+		</where>
+	) m
+	order by m.years desc
+	</select>
+	
+	<select id="queryComapnyWork" parameterType="TjHchbdbCompanyInfo" resultMap="CompanyInfoMap2">
+		select c.id,c.name,e.eid,c.isAvailable
+		from tj_hchbdb_companyInfo c
+		left join tj_hchbdb_companyInfo_equipment ce
+			on c.id = ce.companyid
+		left join tj_hchbdb_equipment e
+			on ce.equipmentid = e.id
+		<where>
+			ce.status = 0
+			<if test="stype == 1"> and e.eid like '%V'</if>
+			<if test="stype == 2"> and e.eid like '%G'</if>
+			<if test="stype == 3"> and e.eid like '%Y'</if>
+			<if test="id != null and id != ''"> and c.id = #{id} </if>
+			<if test="name != null and name != ''"> and c.name like '%${name}%'</if>
+		</where>
+	</select>
+	<select id="queryLastDataByEquipmentidWork" parameterType="java.lang.String" resultType="WorkingHistoricalHoursValue">
+		select w.*, c.name as companyname
+		from (
+			select id, equipmentid, workingtype, probeid, 
+				year(historicaltime) years, month(historicaltime) months,
+				cast(year(historicaltime) as varchar)+'-'+cast(month(historicaltime) as varchar) btime,
+				cast(cast(avg(cast(fancurrent as numeric(10,3))) as numeric(10,3)) as varchar) fancurrent, 
+				cast(cast(avg(cast(vocwpcurrent as numeric(10,3))) as numeric(10,3)) as varchar) vocwpcurrent, 
+				
+				cast(cast(avg(cast(totalcurrent as numeric(10,3))) as numeric(10,3)) as varchar) totalcurrent, 
+				cast(cast(avg(cast(pointscurrent as numeric(10,3))) as numeric(10,3)) as varchar) pointscurrent,
+				cast(cast(avg(cast(adsorption as numeric(10,3))) as numeric(10,3)) as varchar) adsorption,
+				
+				cast(cast(avg(cast(yfan as numeric(10,3))) as numeric(10,3)) as varchar) yfan, 
+				cast(cast(avg(cast(gfan as numeric(10,3))) as numeric(10,3)) as varchar) gfan, 
+				cast(cast(avg(cast(glwpcurrent as numeric(10,3))) as numeric(10,3)) as varchar) glwpcurrent, 
+				
+				cast(cast(avg(cast(gleledust as numeric(10,3))) as numeric(10,3)) as varchar) gleledust,
+				cast(cast(avg(cast(glfilmdust as numeric(10,3))) as numeric(10,3)) as varchar) glfilmdust, 
+				cast(cast(avg(cast(glbagdust as numeric(10,3))) as numeric(10,3)) as varchar) glbagdust
+			from  tj_hchbdb_working_historicalhoursvalue
+			where equipmentid = #{equipmentid}
+				and historicaltime = (select top 1 historicaltime 
+									from tj_hchbdb_working_historicalhoursvalue 
+									where equipmentid = #{equipmentid}
+										and workingtype != 9
+									order by historicaltime desc)
+			group by year(historicaltime), month(historicaltime), id, equipmentid, workingtype, probeid
+		) w 
+		left join tj_hchbdb_equipment e 
+			on w.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment ce 
+			on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c 
+			on ce.companyid = c.id
+		where c.name is not null
+	</select>
+	<select id="queryDataByConditionsPageWork" resultMap="WorkingHistoricalHoursValueMap">	
+	select m.*
+	from (
+		select w.*, c.name as companyname
+		from (
+			select id, equipmentid, workingtype, probeid, 
+				year(historicaltime) years, month(historicaltime) months,
+				cast(year(historicaltime) as varchar)+'-'+cast(month(historicaltime) as varchar) btime,
+				cast(cast(avg(cast(fancurrent as numeric(10,3))) as numeric(10,3)) as varchar) fancurrent, 
+				cast(cast(avg(cast(vocwpcurrent as numeric(10,3))) as numeric(10,3)) as varchar) vocwpcurrent, 
+				
+				cast(cast(avg(cast(totalcurrent as numeric(10,3))) as numeric(10,3)) as varchar) totalcurrent, 
+				cast(cast(avg(cast(pointscurrent as numeric(10,3))) as numeric(10,3)) as varchar) pointscurrent,
+				cast(cast(avg(cast(adsorption as numeric(10,3))) as numeric(10,3)) as varchar) adsorption,
+				
+				cast(cast(avg(cast(yfan as numeric(10,3))) as numeric(10,3)) as varchar) yfan, 
+				cast(cast(avg(cast(gfan as numeric(10,3))) as numeric(10,3)) as varchar) gfan, 
+				cast(cast(avg(cast(glwpcurrent as numeric(10,3))) as numeric(10,3)) as varchar) glwpcurrent, 
+				
+				cast(cast(avg(cast(gleledust as numeric(10,3))) as numeric(10,3)) as varchar) gleledust,
+				cast(cast(avg(cast(glfilmdust as numeric(10,3))) as numeric(10,3)) as varchar) glfilmdust, 
+				cast(cast(avg(cast(glbagdust as numeric(10,3))) as numeric(10,3)) as varchar) glbagdust
+			from  tj_hchbdb_working_historicalhoursvalue
+			<where>
+				<if test="companyInfo.eid != null and companyInfo.eid != ''">  and equipmentid = #{companyInfo.eid} </if>
+				<if test="companyInfo.searchTime != null and companyInfo.searchTime != ''">
+					and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ >= ]]> cast(#{companyInfo.sd} as DATETIME)
+					and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ <= ]]> cast(#{companyInfo.ed} as DATETIME)
+				</if>
+			</where> 
+			group by year(historicaltime), month(historicaltime), id, equipmentid, workingtype, probeid
+		) w 
+		left join tj_hchbdb_equipment e 
+			on w.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment ce 
+			on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c 
+			on ce.companyid = c.id
+		<where> 
+			c.name is not null
+			<if test="companyInfo.name != null and companyInfo.name != ''"> and c.name like '%${companyInfo.name}%'</if>
+		</where>
+	) m
+	order by m.years desc
+
+	</select>
+	
+	<select id="queryComapnyLamp" parameterType="TjHchbdbCompanyInfo" resultMap="CompanyInfoMap3">
+		select c.id,c.name,e.eid,c.isAvailable
+		from tj_hchbdb_companyInfo c
+		left join tj_hchbdb_companyInfo_equipment ce
+			on c.id = ce.companyid
+		left join tj_hchbdb_equipment e
+			on ce.equipmentid = e.id
+		<where>
+			ce.status = 0
+			<if test="stype == 1"> and e.eid like '%V'</if>
+			<if test="stype == 2"> and e.eid like '%G'</if>
+			<if test="stype == 3"> and e.eid like '%Y'</if>
+			<if test="id != null and id != ''"> and c.id = #{id} </if>
+			<if test="name != null and name != ''"> and c.name like '%${name}%'</if>
+		</where>
+	</select>
+	<select id="queryLastDataByEquipmentidLamp" parameterType="java.lang.String" resultType="LampblackHistoricalHoursValue">	
+		select w.*, c.name as companyname
+		from (
+			select id, equipmentid, 
+				year(historicaltime) years, month(historicaltime) months,
+				cast(year(historicaltime) as varchar)+'-'+cast(month(historicaltime) as varchar) btime,
+				cast(cast(avg(cast(concentration as numeric(10,3))) as numeric(10,3)) as varchar) concentration, 
+				cast(cast(avg(cast(purifiercurrent as numeric(10,3))) as numeric(10,3)) as varchar) purifiercurrent, 
+				cast(cast(avg(cast(temperature as numeric(10,3))) as numeric(10,3)) as varchar) temperature
+			from  tj_hchbdb_lampblack_historicalhoursvalue
+			where equipmentid = #{equipmentid}
+				and historicaltime = (select top 1 historicaltime 
+									from tj_hchbdb_lampblack_historicalhoursvalue 
+									where equipmentid = #{equipmentid}
+									order by historicaltime desc)
+			group by year(historicaltime), month(historicaltime), id, equipmentid
+		) w 
+		left join tj_hchbdb_equipment e 
+			on w.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment ce 
+			on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c 
+			on ce.companyid = c.id
+		where c.name is not null
+	</select>
+	<select id="queryDataByConditionsPageLamp" resultMap="LampblackHistoricalHoursValueMap">	
+	select m.*
+	from (
+		select w.*, c.name as companyname
+		from (
+			select id, equipmentid, 
+				year(historicaltime) years, month(historicaltime) months,
+				cast(year(historicaltime) as varchar)+'-'+cast(month(historicaltime) as varchar) btime,
+				cast(cast(avg(cast(concentration as numeric(10,3))) as numeric(10,3)) as varchar) concentration, 
+				cast(cast(avg(cast(purifiercurrent as numeric(10,3))) as numeric(10,3)) as varchar) purifiercurrent, 
+				cast(cast(avg(cast(temperature as numeric(10,3))) as numeric(10,3)) as varchar) temperature
+			from  tj_hchbdb_lampblack_historicalhoursvalue
+			<where>
+				<if test="companyInfo.eid != null and companyInfo.eid != ''">  and equipmentid = #{companyInfo.eid} </if>
+				<if test="companyInfo.searchTime != null and companyInfo.searchTime != ''">
+					and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ >= ]]> cast(#{companyInfo.sd} as DATETIME)
+					and convert(VARCHAR(20), historicaltime, 23) <![CDATA[ <= ]]> cast(#{companyInfo.ed} as DATETIME)
+				</if>
+			</where> 
+			group by year(historicaltime), month(historicaltime), id, equipmentid
+		) w 
+		left join tj_hchbdb_equipment e 
+			on w.equipmentid = e.eid
+		left join tj_hchbdb_companyInfo_equipment ce 
+			on e.id = ce.equipmentid
+		left join tj_hchbdb_companyInfo c 
+			on ce.companyid = c.id
+		<where> 
+			c.name is not null
+			<if test="companyInfo.name != null and companyInfo.name != ''"> and c.name like '%${companyInfo.name}%'</if>
+		</where>
+	) m
+	order by m.years desc
+
+	</select>
+</mapper>

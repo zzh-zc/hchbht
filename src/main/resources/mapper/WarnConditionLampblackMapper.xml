@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hchbht.mapper.WarnConditionLampblackMapper">
+
+	<resultMap type="WarnConditionLampblack" id="WarnConditionLampblackMap">
+		<id column="id" property="id" />
+		<result column="sort" property="sort" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="concentration" property="concentration" />
+		<result column="purifiercurrent" property="purifiercurrent" />	
+		<result column="status" property="status" />
+		<result column="companyid" property="companyid" />
+		<result column="companyname" property="companyname" />	
+	</resultMap>
+	
+	<!-- 添加 -->
+	<insert id="insert" parameterType="WarnConditionLampblack">
+		insert into tj_hchbdb_warnconditionlampblack (
+			status
+			<if test="id != null and id != ''">,id</if>
+			<if test="equipmentid != null and equipmentid != ''"> , equipmentid</if>
+			<if test="concentration != null and concentration != ''">, concentration</if>
+			<if test="purifiercurrent != null and purifiercurrent != ''">, purifiercurrent</if>
+		)values(
+			1
+			<if test="id != null and id != ''">, #{id}</if>
+			<if test="equipmentid != null and equipmentid != ''"> , #{equipmentid}</if>
+			<if test="concentration != null and concentration != ''">, #{concentration}</if>
+			<if test="purifiercurrent != null and purifiercurrent != ''">, #{purifiercurrent}</if>
+		)
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="update" parameterType="WarnConditionLampblack">
+		update 
+			tj_hchbdb_warnconditionlampblack
+		<set>
+			<if test="concentration != null and concentration != ''">concentration=#{concentration}, </if>
+			<if test="equipmentid != null and equipmentid != ''"> equipmentid=#{equipmentid} , </if>
+			<if test="purifiercurrent != null and purifiercurrent != ''">purifiercurrent=#{purifiercurrent}, </if>
+			<if test="status != null">status=#{status}</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<!-- 删除 -->
+	<delete id="delete" parameterType="string">
+		delete from tj_hchbdb_warnconditionlampblack where id=#{id}
+	</delete>
+
+	<!-- 根据条件查询，单一的数据 -->
+	<select id="queryDataByCondition" parameterType="WarnConditionLampblack" resultMap="WarnConditionLampblackMap">
+		select w.*, c.id as companyid, c.name as companyname
+		from tj_hchbdb_warnconditionlampblack w
+		left join tj_hchbdb_equipment e
+			on e.eid = w.equipmentid
+		left join tj_hchbdb_companyInfo_equipment aue 
+				on e.id = aue.equipmentid 
+		left join tj_hchbdb_companyInfo c 
+			on aue.companyid = c.id
+		<where>
+			1=1
+			<if test="id != null and id != ''"> and w.id=#{id}</if>
+			<if test="equipmentid != null and equipmentid != ''"> and w.equipmentid=#{equipmentid}</if>
+			<if test="concentration != null and concentration != ''"> and w.concentration=#{concentration}</if>
+			<if test="purifiercurrent != null and purifiercurrent != ''"> and w.purifiercurrent=#{purifiercurrent}</if>
+			<if test="status != null"> and w.status=#{status}</if>
+		</where>
+	</select>
+	
+	<!-- 根据条件查询，list数据 -->
+	<select id="queryDataByConditions" parameterType="WarnConditionLampblack" resultMap="WarnConditionLampblackMap">
+		select w.*, c.id as companyid, c.name as companyname
+		from tj_hchbdb_warnconditionlampblack w
+		left join tj_hchbdb_equipment e
+			on e.eid = w.equipmentid
+		left join tj_hchbdb_companyInfo_equipment aue 
+				on e.id = aue.equipmentid 
+		left join tj_hchbdb_companyInfo c 
+			on aue.companyid = c.id
+		<where>
+			1=1
+			<if test="id != null and id != ''"> and w.id=#{id}</if>
+			<if test="equipmentid != null and equipmentid != ''"> and w.equipmentid=#{equipmentid}</if>
+			<if test="concentration != null and concentration != ''"> and w.concentration=#{concentration}</if>
+			<if test="purifiercurrent != null and purifiercurrent != ''"> and w.purifiercurrent=#{purifiercurrent}</if>
+			<if test="status != null"> and w.status=#{status}</if>
+		</where>
+	</select>
+	
+	<!-- 数据长度 -->
+	<select id="datasize" parameterType="WarnConditionLampblack" resultType="java.lang.Integer">
+		select count(w.id)
+		from tj_hchbdb_warnconditionlampblack w
+		left join tj_hchbdb_equipment e
+			on e.eid = w.equipmentid
+		left join tj_hchbdb_companyInfo_equipment aue 
+				on e.id = aue.equipmentid 
+		left join tj_hchbdb_companyInfo c 
+			on aue.companyid = c.id
+		<where>
+			1=1
+			<if test="companyname != null and companyname != ''"> and c.name like '%${companyname}%'</if>
+		</where>
+	</select>
+	
+	<!-- 根据条件查询  Page 数据 -->
+	<select id="queryDataByConditionsPage" resultMap="WarnConditionLampblackMap">
+	select  w1.*
+	from (
+		select w.*, c.id as companyid, c.name as companyname
+		from tj_hchbdb_warnconditionlampblack w
+		left join tj_hchbdb_equipment e
+			on e.eid = w.equipmentid
+		left join tj_hchbdb_companyInfo_equipment aue 
+				on e.id = aue.equipmentid 
+		left join tj_hchbdb_companyInfo c 
+			on aue.companyid = c.id
+		<if test="warnConditionLampblack.companyname != null and warnConditionLampblack.companyname != ''"> 
+		where c.name like '%${warnConditionLampblack.companyname}%'
+		</if>
+	) w1, (
+		select m.id
+		from ( 
+			select *
+			from tj_hchbdb_warnconditionlampblack 
+			where
+				1=1
+				<if test="warnConditionLampblack.equipmentid != null and warnConditionLampblack.equipmentid != ''"> 
+					and equipmentid=#{warnConditionLampblack.equipmentid}
+				</if>
+				<if test="warnConditionLampblack.concentration != null and warnConditionLampblack.concentration != ''">
+				 	and concentration=#{warnConditionLampblack.concentration}
+				 </if>
+				<if test="warnConditionLampblack.purifiercurrent != null and warnConditionLampblack.purifiercurrent != ''">
+					and purifiercurrent=#{warnConditionLampblack.purifiercurrent}
+				</if>
+				<if test="warnConditionLampblack.status != null"> and status=#{warnConditionLampblack.status}</if>
+			)m 
+		) w2 
+	where w1.id = w2.id
+	</select>
+	
+	<!-- 根据设备id查询相应的信息 -->
+	<select id="queryDataByEid" parameterType="java.lang.String" resultMap="WarnConditionLampblackMap">
+		select * from tj_hchbdb_warnconditionlampblack where equipmentid=#{w.equipmentid} and status = 1
+	</select>
+</mapper>

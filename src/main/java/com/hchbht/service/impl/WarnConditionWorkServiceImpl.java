@@ -90,7 +90,9 @@ public class WarnConditionWorkServiceImpl implements WarnConditionWorkService {
 	 * 根据条件查询  Page 数据
 	 */
 	public Object queryDataByConditionsPage(Integer curPage,Integer pageSize,WarnConditionWork warnConditionWork) {
-		PageHelper.startPage(curPage,pageSize);
+		if (curPage!= null && pageSize != null) {
+			PageHelper.startPage(curPage, pageSize);
+		}
 		//字段乱码处理
 		//companyInfo = (CompanyInfo) CodeConversionUtils.ObjectConversion(companyInfo, "utf-8");
 		List<WarnConditionWork> list = warnConditionWorkMapper.queryDataByConditionsPage(warnConditionWork);

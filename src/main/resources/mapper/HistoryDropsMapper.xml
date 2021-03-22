@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hchbht.mapper.HistoryDropsMapper">
+
+	<resultMap type="HistoryDrops" id="HistoryDropsMap">
+		<id column="id" property="id" />
+		<result column="sort" property="sort" />
+		<result column="companyid" property="companyid" />
+		<result column="companyname" property="companyname" />
+		<result column="dropstime" property="dropstime" />
+		<result column="equipmentid" property="equipmentid" />		
+		<result column="status" property="status" />		
+	</resultMap>
+	
+	<!-- 添加 -->
+	<insert id="insert" parameterType="HistoryDrops">
+		insert into tj_hchbdb_historydrops (
+			status
+			<if test="id != null and id != ''">,id</if>
+			<if test="companyid != null and companyid != ''">, companyid</if>
+			<if test="companyname != null and companyname != ''">, companyname</if>
+			<if test="dropstime != null and dropstime != ''">, dropstime</if>
+			<if test="equipmentid != null and equipmentid != ''">, equipmentid</if>
+		)values(
+			1
+			<if test="id != null and id != ''">, #{id}</if>
+			<if test="companyid != null and companyid != ''">, #{companyid}</if>
+			<if test="companyname != null and companyname != ''">,#{companyname}</if>
+			<if test="dropstime != null and dropstime != ''">, #{dropstime}</if>
+			<if test="equipmentid != null and equipmentid != ''">,#{equipmentid}</if>
+		)
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="update" parameterType="HistoryDrops">
+		update 
+			tj_hchbdb_historydrops
+		<set>
+			<if test="companyid != null and companyid != ''">companyid=#{companyid}, </if>
+			<if test="companyname != null and companyname != ''">companyname=#{companyname}, </if>
+			<if test="dropstime != null and dropstime != ''">dropstime=#{dropstime}, </if>
+			<if test="equipmentid != null and equipmentid != ''">equipmentid=#{equipmentid}, </if>
+			<if test="status != null">status=#{status}</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<!-- 删除 -->
+	<delete id="delete" parameterType="string">
+		update tj_hchbdb_historydrops set status = 0 where id=#{id}
+	</delete>
+
+	<!-- 根据条件查询，单一的数据 -->
+	<select id="queryDataByCondition" parameterType="HistoryDrops" resultMap="HistoryDropsMap">
+		select * from tj_hchbdb_historydrops
+		<where>
+			1=1
+			<if test="chooseId == 1"> and equipmentid like '%V' or equipmentid like '%G'</if>
+			<if test="chooseId == 2"> and equipmentid like '%Y'</if>
+			<if test="id != null and id != ''"> and id=#{id}</if>
+			<if test="companyid != null and companyid != ''"> and companyid=#{companyid}</if>
+			<if test="companyname != null and companyname != ''"> and companyname=#{companyname}</if>
+			<if test="dropstime != null and dropstime != ''"> and dropstime=#{dropstime}</if>
+			<if test="equipmentid != null and equipmentid != ''"> and equipmentid=#{equipmentid}</if>
+			<if test="status != null"> and status=#{status}</if>
+		</where>
+	</select>
+	
+	<!-- 根据条件查询，list数据 -->
+	<select id="queryDataByConditions" parameterType="HistoryDrops" resultMap="HistoryDropsMap">
+		select * from tj_hchbdb_historydrops
+		<where>
+			1=1
+			<if test="chooseId == 1"> and equipmentid like '%V' or equipmentid like '%G'</if>
+			<if test="chooseId == 2"> and equipmentid like '%Y'</if>
+			<if test="id != null and id != ''"> and id=#{id}</if>
+			<if test="companyid != null and companyid != ''"> and companyid=#{companyid}</if>
+			<if test="companyname != null and companyname != ''"> and companyname like '%${companyname}%'</if>
+			<if test="dropstime != null and dropstime != ''"> and dropstime=#{dropstime}</if>
+			<if test="equipmentid != null and equipmentid != ''"> and equipmentid=#{equipmentid}</if>
+			<if test="status != null"> and status=#{status}</if>
+		</where>
+	</select>
+	
+	<!-- 根据条件查询  Page 数据 -->
+	<select id="queryDataByConditionsPage" parameterType="HistoryDrops" resultMap="HistoryDropsMap">
+		select * from tj_hchbdb_historydrops
+		<where>
+			1=1
+			<if test="chooseId == 1"> and equipmentid like '%V' or equipmentid like '%G'</if>
+			<if test="chooseId == 2"> and equipmentid like '%Y'</if>
+			<if test="id != null and id != ''"> and id=#{id}</if>
+			<if test="companyid != null and companyid != ''"> and companyid=#{companyid}</if>
+			<if test="companyname != null and companyname != ''"> and companyname like '%${companyname}%'</if>
+			<if test="dropstime != null and dropstime != ''"> and dropstime=#{dropstime}</if>
+			<if test="equipmentid != null and equipmentid != ''"> and equipmentid=#{equipmentid}</if>
+			<if test="status != null"> and status=#{status}</if>
+		</where>
+	</select>
+</mapper>

@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hchbht.mapper.HistoricalMapper">
+	<!-- 分钟 -->
+	<resultMap type="AirHistoricalMinutesVOC" id="AirHistoricalMinutesVOCMap">
+		<id column="id" property="id" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="historicaltime" property="historicaltime" />
+		
+		<result column="hydrocarbon" property="hydrocarbon" />
+		<result column="rate" property="rate" />
+		<result column="temperature" property="temperature" />
+		<result column="pressure" property="pressure" />
+		<result column="humidity" property="humidity" />
+		<result column="wastegas" property="wastegas" />
+		
+		<result column="companyid" property="companyid" />
+		<result column="companyname" property="companyname" />
+	</resultMap>
+	<resultMap type="WorkingHistoricalMinutesValue" id="WorkingHistoricalMinutesValueMap">
+		<id column="id" property="id" />
+		<result column="workingtype" property="workingtype" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="equipmentname" property="equipmentname" />
+		<result column="probeid" property="probeid" />
+		<result column="historicaltime" property="historicaltime" />
+		<!-- TVOC字段 -->
+		<result column="fancurrent" property="fancurrent" />
+		<result column="vocwpcurrent" property="vocwpcurrent" />
+		<!-- TVOC 、 锅炉公用字段 -->
+		<result column="adsorption" property="adsorption" />
+		<!-- 锅炉字段 -->
+		<result column="yfan" property="yfan" />
+		<result column="gfan" property="gfan" />
+		<result column="glwpcurrent" property="glwpcurrent" />
+		<result column="gleledust" property="gleledust" />
+		<result column="glfilmdust" property="glfilmdust" />
+		<result column="glbagdust" property="glbagdust" />
+		
+		<!-- 非数据库字段 -->
+		<result column="companyid" property="companyid" />
+		<result column="companyname" property="companyname" />
+	</resultMap>
+	<resultMap type="LampblackHistoricalMinutesValue" id="LampblackHistoricalMinutesValueMap">
+		<id column="id" property="id" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="historicaltime" property="historicaltime" />
+		<result column="concentration" property="concentration" />
+		<result column="purifiercurrent" property="purifiercurrent" />
+		<result column="temperature" property="temperature" />
+		
+		<result column="companyid" property="companyid" />
+		<result column="companyname" property="companyname" />
+	</resultMap>
+	
+	<!-- 小时 -->
+	<resultMap type="AirHistoricalHoursVOC" id="AirHistoricalHoursVOCMap">
+		<id column="id" property="id" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="historicaltime" property="historicaltime" />
+		
+		<result column="hydrocarbon" property="hydrocarbon" />
+		<result column="rate" property="rate" />
+		<result column="temperature" property="temperature" />
+		<result column="pressure" property="pressure" />
+		<result column="humidity" property="humidity" />
+		<result column="wastegas" property="wastegas" />
+		
+		<result column="companyid" property="companyid" />
+		<result column="companyname" property="companyname" />
+	</resultMap>
+	<resultMap type="WorkingHistoricalHoursValue" id="WorkingHistoricalHoursValueMap">
+		<id column="id" property="id" />
+		<result column="workingtype" property="workingtype" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="equipmentname" property="equipmentname" />
+		<result column="probeid" property="probeid" />
+		<result column="historicaltime" property="historicaltime" />
+		<!-- TVOC字段 -->
+		<result column="fancurrent" property="fancurrent" />
+		<result column="vocwpcurrent" property="vocwpcurrent" />
+		<!-- TVOC 、 锅炉公用字段 -->
+		<result column="adsorption" property="adsorption" />
+		<!-- 锅炉字段 -->
+		<result column="yfan" property="yfan" />
+		<result column="gfan" property="gfan" />
+		<result column="glwpcurrent" property="glwpcurrent" />
+		<result column="gleledust" property="gleledust" />
+		<result column="glfilmdust" property="glfilmdust" />
+		<result column="glbagdust" property="glbagdust" />
+		
+		<!-- 非数据库字段 -->
+		<result column="companyid" property="companyid" />
+		<result column="companyname" property="companyname" />
+	</resultMap>
+	<resultMap type="LampblackHistoricalHoursValue" id="LampblackHistoricalHoursValueMap">
+		<id column="id" property="id" />
+		<result column="equipmentid" property="equipmentid" />
+		<result column="historicaltime" property="historicaltime" />
+		<result column="concentration" property="concentration" />
+		<result column="purifiercurrent" property="purifiercurrent" />
+		<result column="temperature" property="temperature" />
+		
+		<result column="companyid" property="companyid" />
+		<result column="companyname" property="companyname" />
+	</resultMap>
+	
+	<!-- 分钟 -->
+	<select id="queryLastDataVocM" resultMap="AirHistoricalMinutesVOCMap">
+	select a.id as companyid, a.name as companyname, a.eid as equipmentid, 
+		b.historicaltime, b.hydrocarbon, b.hydrocarbon, b.rate, b.temperature, 
+		b.pressure, b.humidity, b.wastegas
+	from (select c.id, c.name, e.eid
+		from tj_hchbdb_companyInfo c
+		left join tj_hchbdb_companyInfo_equipment ce
+			on c.id = ce.companyid
+		left join tj_hchbdb_equipment e
+			on ce.equipmentid = e.id	
+		where e.eid like '%V'
+			<if test="companyInfo.name != null and companyInfo.name != ''"> and c.name like '%${companyInfo.name}%'</if>) a
+	left join (select t.* 
+			from (select *,row_number() 
+					over (partition by equipmentid order by historicaltime desc) rn 
+				from (select * 
+					from tj_hchbdb_air_historicalminutesvoc
+					where DATEDIFF(day,historicaltime,GETDATE()) <![CDATA[ < ]]> 10) m
+				) t
+			where rn=1) b
+		on a.eid = b.equipmentid
+	order by a.name desc
+	</select>
+	<select id="queryLastDataWorkM" resultMap="WorkingHistoricalMinutesValueMap">
+	select a.id as companyid, a.name as companyname, a.eid as equipmentid, 
+		b.historicaltime,b.workingtype,
+		b.probeid,b.adsorption,b.glbagdust,
+		b.equipmentname,b.fancurrent,b.fanstate,b.vocwpcurrent,b.vocwpstate,
+		b.yfan,b.yfanstate,b.gfan,b.gfanstate,b.glwpcurrent,b.glwpstate
+	from (select c.id, c.name, e.eid
+		from tj_hchbdb_companyInfo c
+		left join tj_hchbdb_companyInfo_equipment ce
+			on c.id = ce.companyid
+		left join tj_hchbdb_equipment e
+			on ce.equipmentid = e.id	
+		where e.eid like '%G'
+			<if test="companyInfo.name != null and companyInfo.name != ''"> and c.name like '%${companyInfo.name}%'</if>) a
+	left join (select t.* 
+			from (select row_number() over (partition by equipmentid order by historicaltime desc) rn,*
+				from (select * 
+					from tj_hchbdb_working_historicalminutesvalue
+					where DATEDIFF(day,historicaltime,GETDATE()) <![CDATA[ < ]]> 10) m
+				where equipmentid like '%G') t
+			where rn=1) b
+		on a.eid = b.equipmentid
+	order by a.name desc
+	</select>
+	<select id="queryLastDataLampM" resultMap="LampblackHistoricalMinutesValueMap">
+	select a.id as companyid, a.name as companyname, a.eid as equipmentid, 
+		b.historicaltime, b.probeid, b.concentration, b.fanstate, 
+		b.purifierstate, b.purifiercurrent, b.temperature
+	from (select c.id, c.name, e.eid
+		from tj_hchbdb_companyInfo c
+		left join tj_hchbdb_companyInfo_equipment ce
+			on c.id = ce.companyid
+		left join tj_hchbdb_equipment e
+			on ce.equipmentid = e.id	
+		where e.eid like '%Y'
+			<if test="companyInfo.name != null and companyInfo.name != ''"> and c.name like '%${companyInfo.name}%'</if>) a
+	left join (select t.* 
+			from (select *,row_number() 
+					over (partition by equipmentid order by historicaltime desc) rn 
+				from (select * 
+					from tj_hchbdb_lampblack_historicalminutesvalue
+					where DATEDIFF(day,historicaltime,GETDATE()) <![CDATA[ < ]]> 10) m
+				) t
+			where rn=1) b
+		on a.eid = b.equipmentid
+	order by a.name desc
+	</select>
+	
+	<!-- 小时 -->
+	<select id="queryLastDataVocH" resultMap="AirHistoricalHoursVOCMap">
+	select a.id as companyid, a.name as companyname, a.eid as equipmentid, 
+		b.historicaltime, b.hydrocarbon, b.hydrocarbon, b.rate, b.temperature, 
+		b.pressure, b.humidity, b.wastegas
+	from (select c.id, c.name, e.eid
+		from tj_hchbdb_companyInfo c
+		left join tj_hchbdb_companyInfo_equipment ce
+			on c.id = ce.companyid
+		left join tj_hchbdb_equipment e
+			on ce.equipmentid = e.id	
+		where e.eid like '%V'
+			<if test="companyInfo.name != null and companyInfo.name != ''"> and c.name like '%${companyInfo.name}%'</if>) a
+	left join (select t.* 
+			from (select *,row_number() 
+					over (partition by equipmentid order by historicaltime desc) rn 
+				from (select * 
+					from tj_hchbdb_air_historicalhoursvoc
+					where DATEDIFF(day,historicaltime,GETDATE()) <![CDATA[ < ]]> 10) m
+				) t
+			where rn=1) b
+		on a.eid = b.equipmentid
+	order by a.name desc
+	</select>
+	<select id="queryLastDataWorkH" resultMap="WorkingHistoricalHoursValueMap">
+	select a.id as companyid, a.name as companyname, a.eid as equipmentid, 
+		b.historicaltime,b.workingtype,
+		b.probeid,b.adsorption,b.glbagdust,
+		b.equipmentname,b.fancurrent,b.fanstate,b.vocwpcurrent,b.vocwpstate,
+		b.yfan,b.yfanstate,b.gfan,b.gfanstate,b.glwpcurrent,b.glwpstate
+	from (select c.id, c.name, e.eid
+		from tj_hchbdb_companyInfo c
+		left join tj_hchbdb_companyInfo_equipment ce
+			on c.id = ce.companyid
+		left join tj_hchbdb_equipment e
+			on ce.equipmentid = e.id	
+		where e.eid like '%G'
+			<if test="companyInfo.name != null and companyInfo.name != ''"> and c.name like '%${companyInfo.name}%'</if>) a
+	left join (select t.* 
+			from (select row_number() over (partition by equipmentid order by historicaltime desc) rn,*
+				from (select * 
+					from tj_hchbdb_working_historicalhoursvalue
+					where DATEDIFF(day,historicaltime,GETDATE()) <![CDATA[ < ]]> 10) m
+				where equipmentid like '%G') t
+			where rn=1) b
+		on a.eid = b.equipmentid
+	order by a.name desc
+	</select>
+	<select id="queryLastDataLampH" resultMap="LampblackHistoricalHoursValueMap">
+	select a.id as companyid, a.name as companyname, a.eid as equipmentid, 
+		b.historicaltime, b.probeid, b.concentration, b.fanstate, 
+		b.purifierstate, b.purifiercurrent, b.temperature
+	from (select c.id, c.name, e.eid
+		from tj_hchbdb_companyInfo c
+		left join tj_hchbdb_companyInfo_equipment ce
+			on c.id = ce.companyid
+		left join tj_hchbdb_equipment e
+			on ce.equipmentid = e.id	
+		where e.eid like '%Y'
+			<if test="companyInfo.name != null and companyInfo.name != ''"> and c.name like '%${companyInfo.name}%'</if>) a
+	left join (select t.* 
+			from (select *,row_number() 
+					over (partition by equipmentid order by historicaltime desc) rn 
+				from (select * 
+					from tj_hchbdb_lampblack_historicalhoursvalue
+					where DATEDIFF(day,historicaltime,GETDATE()) <![CDATA[ < ]]> 10) m
+				) t
+			where rn=1) b
+		on a.eid = b.equipmentid
+	order by a.name desc
+	</select>
+</mapper>

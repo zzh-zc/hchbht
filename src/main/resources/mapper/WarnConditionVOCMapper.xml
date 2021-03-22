@@ -103,6 +103,6 @@
 	
 	<!-- 根据设备id查询相应的信息 -->
 	<select id="queryDataByEid" parameterType="java.lang.String" resultMap="WarnConditionVOCMap">
-		select * from tj_hchbdb_warnconditionvoc where equipmentid=#{w.equipmentid} and status = 1
+		select * from tj_hchbdb_warnconditionvoc where equipmentid=#{equipmentid} and status = 1
 	</select>
 </mapper>
